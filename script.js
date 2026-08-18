@@ -1,78 +1,22 @@
 /* =====================================
-   DATA DEMO
+   SHOEINFO - SUPABASE CONFIGURATION
    ===================================== */
 
-const shoeDatabase = {
+// GANTI dengan Project URL Supabase Anda
+const SUPABASE_URL = "MASUKKAN_PROJECT_URL_ANDA";
 
-    "nike air max 270": {
-        name: "Nike Air Max 270",
-
-        advantages: [
-            "Menggunakan Air unit besar untuk memberikan cushioning yang nyaman.",
-            "Desain modern dan cocok digunakan untuk aktivitas sehari-hari.",
-            "Upper dirancang agar memberikan kenyamanan dan sirkulasi udara yang baik."
-        ],
-
-        materials: [
-            "Mesh pada bagian upper.",
-            "Foam pada bagian midsole.",
-            "Rubber pada bagian outsole."
-        ],
-
-        functions: [
-            "Cocok untuk penggunaan sehari-hari.",
-            "Nyaman digunakan untuk berjalan dan aktivitas ringan.",
-            "Lebih ditujukan untuk lifestyle dibanding olahraga performa tinggi."
-        ]
-    },
+// GANTI dengan Publishable Key Supabase Anda
+const SUPABASE_KEY = "MASUKKAN_PUBLISHABLE_KEY_ANDA";
 
 
-    "ah8050-100": {
-        name: "Nike Air Max 270 - AH8050-100",
+/* =====================================
+   SUPABASE CLIENT
+   ===================================== */
 
-        advantages: [
-            "Menggunakan Air Max 270 cushioning.",
-            "Memberikan kenyamanan untuk penggunaan harian.",
-            "Memiliki desain lifestyle yang modern."
-        ],
-
-        materials: [
-            "Mesh dan material sintetis pada upper.",
-            "Foam pada midsole.",
-            "Rubber pada outsole."
-        ],
-
-        functions: [
-            "Untuk penggunaan sehari-hari.",
-            "Cocok untuk berjalan dan aktivitas ringan.",
-            "Cocok sebagai sepatu lifestyle."
-        ]
-    },
-
-
-    "adidas ultraboost": {
-        name: "adidas Ultraboost",
-
-        advantages: [
-            "Cushioning dirancang untuk memberikan respons yang nyaman.",
-            "Desain upper memberikan dukungan pada kaki.",
-            "Cocok digunakan untuk aktivitas yang membutuhkan kenyamanan."
-        ],
-
-        materials: [
-            "Textile atau knit pada bagian upper.",
-            "Foam cushioning pada bagian midsole.",
-            "Rubber pada bagian outsole."
-        ],
-
-        functions: [
-            "Cocok untuk running dan aktivitas sehari-hari tergantung variannya.",
-            "Dapat digunakan untuk berjalan.",
-            "Dirancang untuk memberikan kenyamanan pada kaki."
-        ]
-    }
-
-};
+const supabaseClient = window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+);
 
 
 /* =====================================
@@ -102,12 +46,11 @@ const functions = document.getElementById("functions");
    SEARCH FUNCTION
    ===================================== */
 
-function searchShoe() {
+async function searchShoe() {
 
-    const query = shoeInput.value.trim().toLowerCase();
+    const query = shoeInput.value.trim();
 
-
-    // Jika input kosong
+    // Input kosong
     if (query === "") {
 
         alert("Silakan masukkan nama sepatu atau SKU.");
@@ -125,14 +68,17 @@ function searchShoe() {
 
     loading.classList.remove("hidden");
 
+    searchButton.disabled = true;
 
-    // Simulasi proses pencarian
-    setTimeout(() => {
 
-        const shoe = findShoe(query);
+    try {
+
+        const shoe = await findShoe(query);
 
 
         loading.classList.add("hidden");
+
+        searchButton.disabled = false;
 
 
         if (!shoe) {
@@ -145,28 +91,78 @@ function searchShoe() {
 
         showResult(shoe);
 
-    }, 700);
+
+    } catch (error) {
+
+        console.error("Supabase Error:", error);
+
+        loading.classList.add("hidden");
+
+        searchButton.disabled = false;
+
+        showError();
+
+    }
 
 }
 
 
 /* =====================================
-   FIND SHOE
+   FIND SHOE FROM SUPABASE
    ===================================== */
 
-function findShoe(query) {
+async function findShoe(query) {
 
-    // Pencarian berdasarkan nama/SKU
-    for (const key in shoeDatabase) {
+    const search = query.trim();
 
-        if (
-            query.includes(key) ||
-            key.includes(query)
-        ) {
 
-            return shoeDatabase[key];
+    /*
+     * 1. Cari berdasarkan SKU terlebih dahulu
+     */
 
-        }
+    const { data: skuData, error: skuError } = await supabaseClient
+        .from("products")
+        .select("*")
+        .ilike("sku", search)
+        .limit(1);
+
+
+    if (skuError) {
+
+        throw skuError;
+
+    }
+
+
+    if (skuData && skuData.length > 0) {
+
+        return skuData[0];
+
+    }
+
+
+    /*
+     * 2. Kalau SKU tidak ditemukan,
+     *    cari berdasarkan nama sepatu
+     */
+
+    const { data: nameData, error: nameError } = await supabaseClient
+        .from("products")
+        .select("*")
+        .ilike("name", `%${search}%`)
+        .limit(1);
+
+
+    if (nameError) {
+
+        throw nameError;
+
+    }
+
+
+    if (nameData && nameData.length > 0) {
+
+        return nameData[0];
 
     }
 
@@ -182,10 +178,11 @@ function findShoe(query) {
 
 function showResult(shoe) {
 
-    productName.textContent = shoe.name;
+    productName.textContent = shoe.name || "Nama produk tidak tersedia";
 
 
     // Bersihkan hasil sebelumnya
+
     advantages.innerHTML = "";
 
     materials.innerHTML = "";
@@ -193,43 +190,75 @@ function showResult(shoe) {
     functions.innerHTML = "";
 
 
-    // Keunggulan
-    shoe.advantages.forEach(item => {
+    /*
+     * KEUNGGULAN
+     */
 
-        const li = document.createElement("li");
-
-        li.textContent = item;
-
-        advantages.appendChild(li);
-
-    });
-
-
-    // Bahan
-    shoe.materials.forEach(item => {
-
-        const li = document.createElement("li");
-
-        li.textContent = item;
-
-        materials.appendChild(li);
-
-    });
+    renderList(
+        advantages,
+        shoe.advantages,
+        "Informasi keunggulan belum tersedia."
+    );
 
 
-    // Fungsi
-    shoe.functions.forEach(item => {
+    /*
+     * BAHAN
+     */
 
-        const li = document.createElement("li");
+    renderList(
+        materials,
+        shoe.materials,
+        "Informasi bahan belum tersedia."
+    );
 
-        li.textContent = item;
 
-        functions.appendChild(li);
+    /*
+     * FUNGSI
+     */
 
-    });
+    renderList(
+        functions,
+        shoe.functions,
+        "Informasi fungsi belum tersedia."
+    );
 
 
     resultSection.classList.remove("hidden");
+
+}
+
+
+/* =====================================
+   RENDER LIST
+   ===================================== */
+
+function renderList(element, items, emptyMessage) {
+
+    element.innerHTML = "";
+
+
+    if (!items || !Array.isArray(items) || items.length === 0) {
+
+        const li = document.createElement("li");
+
+        li.textContent = emptyMessage;
+
+        element.appendChild(li);
+
+        return;
+
+    }
+
+
+    items.forEach(item => {
+
+        const li = document.createElement("li");
+
+        li.textContent = item;
+
+        element.appendChild(li);
+
+    });
 
 }
 
@@ -245,7 +274,7 @@ function showNotFound(query) {
 
     advantages.innerHTML = `
         <li>
-            Belum ada data untuk "${query}" pada versi demo.
+            Produk "${query}" belum tersedia di database ShoeInfo.
         </li>
     `;
 
@@ -270,22 +299,63 @@ function showNotFound(query) {
 
 
 /* =====================================
+   ERROR
+   ===================================== */
+
+function showError() {
+
+    productName.textContent = "Terjadi kesalahan";
+
+
+    advantages.innerHTML = `
+        <li>
+            Website tidak dapat terhubung ke database.
+        </li>
+    `;
+
+
+    materials.innerHTML = `
+        <li>
+            Silakan coba beberapa saat lagi.
+        </li>
+    `;
+
+
+    functions.innerHTML = `
+        <li>
+            Jika masalah terus terjadi, periksa konfigurasi Supabase.
+        </li>
+    `;
+
+
+    resultSection.classList.remove("hidden");
+
+}
+
+
+/* =====================================
    BUTTON EVENT
    ===================================== */
 
-searchButton.addEventListener("click", searchShoe);
+searchButton.addEventListener(
+    "click",
+    searchShoe
+);
 
 
 /* =====================================
    ENTER KEY
    ===================================== */
 
-shoeInput.addEventListener("keydown", function(event) {
+shoeInput.addEventListener(
+    "keydown",
+    function(event) {
 
-    if (event.key === "Enter") {
+        if (event.key === "Enter") {
 
-        searchShoe();
+            searchShoe();
+
+        }
 
     }
-
-});
+);
