@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShoeInfo - Informasi Sepatu</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <main class="container">
+
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">Shoe<span>Info</span></div>
+
+            <p class="subtitle">
+                Temukan informasi sepatu dengan cepat
+            </p>
+        </header>
+
+
+        <!-- Search Section -->
+        <section class="search-section">
+
+            <div class="search-box">
+
+                <input
+                    type="text"
+                    id="shoeInput"
+                    placeholder="Masukkan nama sepatu, SKU, atau artikel..."
+                    autocomplete="off"
+                >
+
+                <button id="searchButton">
+                    Cari Informasi
+                </button>
+
+            </div>
+
+            <p class="search-hint">
+                Contoh: Nike Air Max 270 atau AH8050-100
+            </p>
+
+        </section>
+
+
+        <!-- Loading -->
+        <div id="loading" class="loading hidden">
+            <div class="spinner"></div>
+            <p>Mencari informasi...</p>
+        </div>
+
+
+        <!-- Result -->
+        <section id="resultSection" class="result-section hidden">
+
+            <!-- Product Title -->
+            <div class="product-header">
+                <p class="result-label">HASIL PENCARIAN</p>
+
+                <h1 id="productName">
+                    -
+                </h1>
+            </div>
+
+
+            <!-- Keunggulan -->
+            <article class="info-card">
+
+                <div class="card-icon">
+                    ★
+                </div>
+
+                <div class="card-content">
+
+                    <h2>Keunggulan</h2>
+
+                    <ul id="advantages">
+                    </ul>
+
+                </div>
+
+            </article>
+
+
+            <!-- Bahan -->
+            <article class="info-card">
+
+                <div class="card-icon">
+                    ◈
+                </div>
+
+                <div class="card-content">
+
+                    <h2>Bahan</h2>
+
+                    <ul id="materials">
+                    </ul>
+
+                </div>
+
+            </article>
+
+
+            <!-- Fungsi -->
+            <article class="info-card">
+
+                <div class="card-icon">
+                    ◎
+                </div>
+
+                <div class="card-content">
+
+                    <h2>Fungsi</h2>
+
+                    <ul id="functions">
+                    </ul>
+
+                </div>
+
+            </article>
+
+
+            <!-- Source -->
+            <div class="source-info">
+
+                <span>ⓘ</span>
+
+                <p>
+                    Informasi pada versi demo ini menggunakan data contoh.
+                    Pada tahap berikutnya kita akan menghubungkannya dengan
+                    sumber informasi dari web.
+                </p>
+
+            </div>
+
+        </section>
+
+
+        <!-- Empty State -->
+        <section id="emptyState" class="empty-state">
+
+            <div class="empty-icon">
+                👟
+            </div>
+
+            <h2>Belum ada pencarian</h2>
+
+            <p>
+                Masukkan nama sepatu atau SKU untuk melihat
+                informasi produk.
+            </p>
+
+        </section>
+
+
+        <!-- Footer -->
+        <footer class="footer">
+
+            <p>
+                ShoeInfo © 2026
+            </p>
+
+        </footer>
+
+    </main>
+
+
+    <script src="script.js"></script>
+
+</body>
+</html>
