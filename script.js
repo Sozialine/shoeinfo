@@ -3,10 +3,10 @@
    ===================================== */
 
 // GANTI dengan Project URL Supabase Anda
-const SUPABASE_URL = "MASUKKAN_PROJECT_URL_ANDA";
+const SUPABASE_URL = "https://kqwfxglzelhdjsxeceld.supabase.co";
 
 // GANTI dengan Publishable Key Supabase Anda
-const SUPABASE_KEY = "MASUKKAN_PUBLISHABLE_KEY_ANDA";
+const SUPABASE_KEY = "sb_publishable_PQbg0iClbuSLCjurjMT_Nw_-YjIply-";
 
 
 /* =====================================
