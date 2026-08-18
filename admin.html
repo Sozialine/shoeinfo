@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>ShoeInfo - Backend</title>
+
+    <link rel="stylesheet" href="admin.css">
+
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+
+<body>
+
+    <div class="admin-container">
+
+        <!-- HEADER -->
+
+        <header class="admin-header">
+
+            <div>
+                <div class="logo">
+                    Shoe<span>Info</span>
+                </div>
+
+                <p>
+                    Backend & Database
+                </p>
+            </div>
+
+            <a href="index.html" class="back-button">
+                ← Website
+            </a>
+
+        </header>
+
+
+        <!-- STATISTIK -->
+
+        <section class="stats">
+
+            <div class="stat-card">
+
+                <span>Total Produk</span>
+
+                <strong id="totalProducts">
+                    0
+                </strong>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <span>Produk Manual</span>
+
+                <strong id="manualProducts">
+                    0
+                </strong>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <span>Produk AI</span>
+
+                <strong id="aiProducts">
+                    0
+                </strong>
+
+            </div>
+
+        </section>
+
+
+        <!-- FORM PRODUK -->
+
+        <section class="panel">
+
+            <div class="panel-header">
+
+                <div>
+
+                    <h2 id="formTitle">
+                        Tambah Produk
+                    </h2>
+
+                    <p>
+                        Masukkan informasi sepatu ke database.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <form id="productForm">
+
+                <input
+                    type="hidden"
+                    id="productId"
+                >
+
+
+                <div class="form-grid">
+
+                    <div class="form-group">
+
+                        <label>
+                            SKU
+                        </label>
+
+                        <input
+                            type="text"
+                            id="sku"
+                            placeholder="Contoh: AH8050-100"
+                        >
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label>
+                            Nama Sepatu *
+                        </label>
+
+                        <input
+                            type="text"
+                            id="name"
+                            placeholder="Nike Air Max 270"
+                            required
+                        >
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label>
+                            Brand
+                        </label>
+
+                        <input
+                            type="text"
+                            id="brand"
+                            placeholder="Nike"
+                        >
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label>
+                            Source
+                        </label>
+
+                        <input
+                            type="text"
+                            id="source"
+                            placeholder="Manual / Google / Website resmi"
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Keunggulan
+                    </label>
+
+                    <textarea
+                        id="advantages"
+                        placeholder="Satu keunggulan per baris..."
+                    ></textarea>
+
+                    <small>
+                        Contoh: Cushioning nyaman
+                    </small>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Bahan
+                    </label>
+
+                    <textarea
+                        id="materials"
+                        placeholder="Satu bahan per baris..."
+                    ></textarea>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Fungsi
+                    </label>
+
+                    <textarea
+                        id="functions"
+                        placeholder="Satu fungsi per baris..."
+                    ></textarea>
+
+                </div>
+
+
+                <div class="form-actions">
+
+                    <button
+                        type="submit"
+                        class="save-button"
+                    >
+                        Simpan Produk
+                    </button>
+
+                    <button
+                        type="button"
+                        id="cancelButton"
+                        class="cancel-button"
+                    >
+                        Batal
+                    </button>
+
+                </div>
+
+            </form>
+
+        </section>
+
+
+        <!-- DAFTAR PRODUK -->
+
+        <section class="panel">
+
+            <div class="products-header">
+
+                <div>
+
+                    <h2>
+                        Database Produk
+                    </h2>
+
+                    <p>
+                        Semua produk yang tersimpan di ShoeInfo.
+                    </p>
+
+                </div>
+
+
+                <input
+                    type="text"
+                    id="searchProducts"
+                    placeholder="Cari nama / SKU..."
+                >
+
+            </div>
+
+
+            <div class="table-wrapper">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+
+                            <th>SKU</th>
+
+                            <th>Nama</th>
+
+                            <th>Brand</th>
+
+                            <th>Sumber</th>
+
+                            <th>AI</th>
+
+                            <th>Aksi</th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody id="productsTable">
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+
+        <div
+            id="message"
+            class="message hidden"
+        ></div>
+
+
+    </div>
+
+
+    <script src="admin.js"></script>
+
+</body>
+
+</html>
