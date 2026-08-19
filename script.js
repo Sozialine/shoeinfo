@@ -89,42 +89,44 @@ async function searchShoe() {
         // REQUEST KE EDGE FUNCTION
         // =====================================
 
-        const response =
-            await fetch(
-                API_URL,
-                {
-                    method: "POST",
+       const response = await fetch(API_URL, {
 
-                    headers: {
-                        "Content-Type":
-                            "application/json"
-                    },
+    method: "POST",
 
-                    body:
-                        JSON.stringify({
-                            query: query
-                        })
-                }
-            );
+    headers: {
+        "Content-Type": "application/json",
+        "apikey": "sb_publishable_PQbg0iClbuSLCjurjMT_Nw_-YjIply-"
+    },
+
+    body: JSON.stringify({
+        query: query
+    })
+
+});
 
 
         // Ambil response dengan aman
-        const data =
-            await response.json();
+        const data = await response.json();
+
+console.log("Status:", response.status);
+console.log("Response API:", data);
 
 
         // =====================================
         // SERVER ERROR
         // =====================================
 
-        if (!response.ok) {
+       if (!response.ok) {
 
-            throw new Error(
-                data.error ||
-                "Terjadi kesalahan pada server."
-            );
+    console.error("API Error:", data);
 
-        }
+    throw new Error(
+        data.error ||
+        data.message ||
+        `HTTP Error ${response.status}`
+    );
+
+}
 
 
         // =====================================
