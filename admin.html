@@ -1,50 +1,171 @@
+
 <!DOCTYPE html>
 <html lang="id">
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>ShoeInfo - Backend</title>
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
-    <link rel="stylesheet" href="admin.css">
+    <title>
+        ShoeInfo - Admin
+    </title>
 
-    <!-- Supabase -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link
+        rel="stylesheet"
+        href="admin.css"
+    >
+
 </head>
 
 <body>
 
-    <div class="admin-container">
+    <!-- =====================================
+         LOGIN ADMIN
+    ====================================== -->
 
-        <!-- HEADER -->
+    <section
+        id="loginSection"
+        class="login-section"
+    >
+
+        <div class="login-card">
+
+            <div class="login-logo">
+                Shoe<span>Info</span>
+            </div>
+
+            <p class="login-subtitle">
+                Login ke Dashboard Admin
+            </p>
+
+
+            <form id="loginForm">
+
+                <div class="form-group">
+
+                    <label for="adminUsername">
+                        Username
+                    </label>
+
+                    <input
+                        type="text"
+                        id="adminUsername"
+                        placeholder="Masukkan username"
+                        autocomplete="username"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="adminPassword">
+                        Password
+                    </label>
+
+                    <input
+                        type="password"
+                        id="adminPassword"
+                        placeholder="Masukkan password"
+                        autocomplete="current-password"
+                        required
+                    >
+
+                </div>
+
+
+                <button
+                    type="submit"
+                    id="loginButton"
+                    class="login-button"
+                >
+                    Login
+                </button>
+
+            </form>
+
+
+            <p
+                id="loginMessage"
+                class="login-message hidden"
+            ></p>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- =====================================
+         DASHBOARD ADMIN
+    ====================================== -->
+
+    <div
+        id="adminDashboard"
+        class="admin-container hidden"
+    >
+
+
+        <!-- =====================================
+             HEADER
+        ====================================== -->
 
         <header class="admin-header">
 
             <div>
+
                 <div class="logo">
                     Shoe<span>Info</span>
                 </div>
 
                 <p>
-                    Backend & Database
+                    Dashboard Admin & Database
                 </p>
+
             </div>
 
-            <a href="index.html" class="back-button">
-                ← Website
-            </a>
+
+            <div class="header-actions">
+
+                <a
+                    href="index.html"
+                    class="back-button"
+                >
+                    ← Website
+                </a>
+
+
+                <button
+                    type="button"
+                    id="logoutButton"
+                    class="logout-button"
+                >
+                    Logout
+                </button>
+
+            </div>
 
         </header>
 
 
-        <!-- STATISTIK -->
+
+        <!-- =====================================
+             STATISTIK
+        ====================================== -->
 
         <section class="stats">
 
+
             <div class="stat-card">
 
-                <span>Total Produk</span>
+                <span>
+                    Total Produk
+                </span>
 
                 <strong id="totalProducts">
                     0
@@ -53,9 +174,12 @@
             </div>
 
 
+
             <div class="stat-card">
 
-                <span>Produk Manual</span>
+                <span>
+                    Produk Manual
+                </span>
 
                 <strong id="manualProducts">
                     0
@@ -64,9 +188,12 @@
             </div>
 
 
+
             <div class="stat-card">
 
-                <span>Produk AI</span>
+                <span>
+                    Produk AI
+                </span>
 
                 <strong id="aiProducts">
                     0
@@ -74,12 +201,17 @@
 
             </div>
 
+
         </section>
 
 
-        <!-- FORM PRODUK -->
+
+        <!-- =====================================
+             FORM PRODUK
+        ====================================== -->
 
         <section class="panel">
+
 
             <div class="panel-header">
 
@@ -98,7 +230,9 @@
             </div>
 
 
+
             <form id="productForm">
+
 
                 <input
                     type="hidden"
@@ -106,11 +240,13 @@
                 >
 
 
+
                 <div class="form-grid">
+
 
                     <div class="form-group">
 
-                        <label>
+                        <label for="sku">
                             SKU
                         </label>
 
@@ -123,63 +259,68 @@
                     </div>
 
 
+
                     <div class="form-group">
 
-                        <label>
+                        <label for="name">
                             Nama Sepatu *
                         </label>
 
                         <input
                             type="text"
                             id="name"
-                            placeholder="Nike Air Max 270"
+                            placeholder="Contoh: Nike Air Max 270"
                             required
                         >
 
                     </div>
 
 
+
                     <div class="form-group">
 
-                        <label>
+                        <label for="brand">
                             Brand
                         </label>
 
                         <input
                             type="text"
                             id="brand"
-                            placeholder="Nike"
+                            placeholder="Contoh: Nike"
                         >
 
                     </div>
 
 
+
                     <div class="form-group">
 
-                        <label>
-                            Source
+                        <label for="source">
+                            Sumber
                         </label>
 
                         <input
                             type="text"
                             id="source"
-                            placeholder="Manual / Google / Website resmi"
+                            placeholder="Manual / AI / Website resmi"
                         >
 
                     </div>
 
+
                 </div>
+
 
 
                 <div class="form-group">
 
-                    <label>
+                    <label for="advantages">
                         Keunggulan
                     </label>
 
                     <textarea
                         id="advantages"
-                        placeholder="Satu keunggulan per baris..."
+                        placeholder="Tulis satu keunggulan pada setiap baris..."
                     ></textarea>
 
                     <small>
@@ -189,32 +330,35 @@
                 </div>
 
 
+
                 <div class="form-group">
 
-                    <label>
+                    <label for="materials">
                         Bahan
                     </label>
 
                     <textarea
                         id="materials"
-                        placeholder="Satu bahan per baris..."
+                        placeholder="Tulis satu bahan pada setiap baris..."
                     ></textarea>
 
                 </div>
 
 
+
                 <div class="form-group">
 
-                    <label>
+                    <label for="functions">
                         Fungsi
                     </label>
 
                     <textarea
                         id="functions"
-                        placeholder="Satu fungsi per baris..."
+                        placeholder="Tulis satu fungsi pada setiap baris..."
                     ></textarea>
 
                 </div>
+
 
 
                 <div class="form-actions">
@@ -226,6 +370,7 @@
                         Simpan Produk
                     </button>
 
+
                     <button
                         type="button"
                         id="cancelButton"
@@ -236,16 +381,22 @@
 
                 </div>
 
+
             </form>
 
         </section>
 
 
-        <!-- DAFTAR PRODUK -->
+
+        <!-- =====================================
+             DAFTAR PRODUK
+        ====================================== -->
 
         <section class="panel">
 
+
             <div class="products-header">
+
 
                 <div>
 
@@ -260,50 +411,76 @@
                 </div>
 
 
+
                 <input
                     type="text"
                     id="searchProducts"
-                    placeholder="Cari nama / SKU..."
+                    placeholder="Cari nama, brand, atau SKU..."
                 >
+
 
             </div>
 
 
+
             <div class="table-wrapper">
 
+
                 <table>
+
 
                     <thead>
 
                         <tr>
 
-                            <th>SKU</th>
+                            <th>
+                                SKU
+                            </th>
 
-                            <th>Nama</th>
+                            <th>
+                                Nama
+                            </th>
 
-                            <th>Brand</th>
+                            <th>
+                                Brand
+                            </th>
 
-                            <th>Sumber</th>
+                            <th>
+                                Sumber
+                            </th>
 
-                            <th>AI</th>
+                            <th>
+                                AI
+                            </th>
 
-                            <th>Aksi</th>
+                            <th>
+                                Aksi
+                            </th>
 
                         </tr>
 
                     </thead>
 
 
+
                     <tbody id="productsTable">
 
                     </tbody>
 
+
                 </table>
+
 
             </div>
 
+
         </section>
 
+
+
+        <!-- =====================================
+             MESSAGE
+        ====================================== -->
 
         <div
             id="message"
@@ -313,6 +490,11 @@
 
     </div>
 
+
+
+    <!-- =====================================
+         JAVASCRIPT
+    ====================================== -->
 
     <script src="admin.js"></script>
 

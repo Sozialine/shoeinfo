@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+
+```
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
+
+<title>Login Admin - ShoeInfo</title>
+
+<link
+    rel="stylesheet"
+    href="admin.css"
+>
+```
+
+</head>
+
+<body>
+
+```
+<main class="login-page">
+
+    <section class="login-card">
+
+        <!-- Logo -->
+
+        <div class="login-brand">
+
+            <div class="login-logo">
+                👟
+            </div>
+
+            <h1>
+                Shoe<span>Info</span>
+            </h1>
+
+            <p>
+                Dashboard Administrator
+            </p>
+
+        </div>
+
+
+        <!-- Login Form -->
+
+        <form
+            id="loginForm"
+            class="login-form"
+        >
+
+            <div class="form-group">
+
+                <label for="username">
+                    Username
+                </label>
+
+                <input
+                    type="text"
+                    id="username"
+                    name="username"
+                    placeholder="Masukkan username"
+                    autocomplete="username"
+                    required
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="password">
+                    Password
+                </label>
+
+                <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    placeholder="Masukkan password"
+                    autocomplete="current-password"
+                    required
+                >
+
+            </div>
+
+
+            <!-- Pesan Error -->
+
+            <div
+                id="loginMessage"
+                class="login-message hidden"
+            >
+            </div>
+
+
+            <!-- Tombol Login -->
+
+            <button
+                type="submit"
+                id="loginButton"
+                class="login-button"
+            >
+                Masuk ke Dashboard
+            </button>
+
+        </form>
+
+
+        <!-- Footer -->
+
+        <p class="login-footer">
+
+            ShoeInfo Admin © 2026
+
+        </p>
+
+    </section>
+
+</main>
+
+
+<script src="login.js"></script>
+```
+
+</body>
+</html>
