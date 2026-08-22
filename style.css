@@ -471,3 +471,66 @@ body {
     }
 
 }
+/* ================================
+   SEARCH SUGGESTIONS
+================================ */
+
+.suggestions {
+    background: white;
+
+    border: 1px solid #e5e5e5;
+
+    border-radius: 14px;
+
+    margin-top: 8px;
+
+    padding: 8px;
+
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.06);
+}
+
+
+.suggestion-title {
+    padding: 10px 12px 8px;
+
+    font-size: 12px;
+
+    font-weight: 600;
+
+    color: #737373;
+}
+
+
+.suggestion-item {
+    width: 100%;
+
+    display: block;
+
+    text-align: left;
+
+    border: none;
+
+    background: transparent;
+
+    padding: 12px;
+
+    border-radius: 10px;
+
+    font-size: 14px;
+
+    color: #171717;
+
+    cursor: pointer;
+
+    transition: 0.2s;
+}
+
+
+.suggestion-item:hover {
+    background: #f5f5f5;
+}
+
+
+.suggestion-item:active {
+    transform: scale(0.99);
+}

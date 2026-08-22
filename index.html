@@ -2,10 +2,18 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
     <title>ShoeInfo - Informasi Sepatu</title>
 
-    <link rel="stylesheet" href="style.css">
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
 </head>
 
 <body>
@@ -14,11 +22,15 @@
 
         <!-- Header -->
         <header class="header">
-            <div class="logo">Shoe<span>Info</span></div>
+
+            <div class="logo">
+                Shoe<span>Info</span>
+            </div>
 
             <p class="subtitle">
                 Temukan informasi sepatu dengan cepat
             </p>
+
         </header>
 
 
@@ -34,11 +46,34 @@
                     autocomplete="off"
                 >
 
-                <button id="searchButton">
+                <button
+                    id="searchButton"
+                    type="button"
+                >
                     Cari Informasi
                 </button>
 
             </div>
+
+
+            <!-- Search Suggestions -->
+            <div
+                id="suggestionsSection"
+                class="suggestions-section hidden"
+            >
+
+                <p class="suggestions-title">
+                    Rekomendasi pencarian
+                </p>
+
+                <div
+                    id="suggestionsList"
+                    class="suggestions-list"
+                >
+                </div>
+
+            </div>
+
 
             <p class="search-hint">
                 Contoh: Nike Air Max 270 atau AH8050-100
@@ -48,22 +83,37 @@
 
 
         <!-- Loading -->
-        <div id="loading" class="loading hidden">
+        <div
+            id="loading"
+            class="loading hidden"
+        >
+
             <div class="spinner"></div>
-            <p>Mencari informasi...</p>
+
+            <p>
+                Mencari informasi...
+            </p>
+
         </div>
 
 
         <!-- Result -->
-        <section id="resultSection" class="result-section hidden">
+        <section
+            id="resultSection"
+            class="result-section hidden"
+        >
 
             <!-- Product Title -->
             <div class="product-header">
-                <p class="result-label">HASIL PENCARIAN</p>
+
+                <p class="result-label">
+                    HASIL PENCARIAN
+                </p>
 
                 <h1 id="productName">
                     -
                 </h1>
+
             </div>
 
 
@@ -76,7 +126,9 @@
 
                 <div class="card-content">
 
-                    <h2>Keunggulan</h2>
+                    <h2>
+                        Keunggulan
+                    </h2>
 
                     <ul id="advantages">
                     </ul>
@@ -95,7 +147,9 @@
 
                 <div class="card-content">
 
-                    <h2>Bahan</h2>
+                    <h2>
+                        Bahan
+                    </h2>
 
                     <ul id="materials">
                     </ul>
@@ -114,7 +168,9 @@
 
                 <div class="card-content">
 
-                    <h2>Fungsi</h2>
+                    <h2>
+                        Fungsi
+                    </h2>
 
                     <ul id="functions">
                     </ul>
@@ -127,12 +183,14 @@
             <!-- Source -->
             <div class="source-info">
 
-                <span>ⓘ</span>
+                <span>
+                    ⓘ
+                </span>
 
                 <p>
-                    Informasi pada versi demo ini menggunakan data contoh.
-                    Pada tahap berikutnya kita akan menghubungkannya dengan
-                    sumber informasi dari web.
+                    Informasi produk dapat berasal dari database ShoeInfo
+                    atau dibuat menggunakan AI Gemini ketika informasi
+                    belum tersedia di database.
                 </p>
 
             </div>
@@ -141,13 +199,18 @@
 
 
         <!-- Empty State -->
-        <section id="emptyState" class="empty-state">
+        <section
+            id="emptyState"
+            class="empty-state"
+        >
 
             <div class="empty-icon">
                 👟
             </div>
 
-            <h2>Belum ada pencarian</h2>
+            <h2>
+                Belum ada pencarian
+            </h2>
 
             <p>
                 Masukkan nama sepatu atau SKU untuk melihat
