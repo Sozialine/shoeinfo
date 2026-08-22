@@ -1,6 +1,9 @@
+```html
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
+
     <meta charset="UTF-8">
 
     <meta
@@ -14,13 +17,19 @@
         rel="stylesheet"
         href="style.css"
     >
+
 </head>
+
 
 <body>
 
     <main class="container">
 
-        <!-- Header -->
+
+        <!-- ================================
+             HEADER
+        ================================= -->
+
         <header class="header">
 
             <div class="logo">
@@ -34,8 +43,13 @@
         </header>
 
 
-        <!-- Search Section -->
+        <!-- ================================
+             SEARCH SECTION
+        ================================= -->
+
         <section class="search-section">
+
+            <!-- SEARCH BOX -->
 
             <div class="search-box">
 
@@ -56,24 +70,19 @@
             </div>
 
 
-            <!-- Search Suggestions -->
+            <!-- ================================
+                 SEARCH SUGGESTIONS
+                 Digunakan oleh script.js
+            ================================= -->
+
             <div
-                id="suggestionsSection"
-                class="suggestions-section hidden"
+                id="suggestions"
+                class="suggestions hidden"
             >
-
-                <p class="suggestions-title">
-                    Rekomendasi pencarian
-                </p>
-
-                <div
-                    id="suggestionsList"
-                    class="suggestions-list"
-                >
-                </div>
-
             </div>
 
+
+            <!-- SEARCH HINT -->
 
             <p class="search-hint">
                 Contoh: Nike Air Max 270 atau AH8050-100
@@ -82,7 +91,10 @@
         </section>
 
 
-        <!-- Loading -->
+        <!-- ================================
+             LOADING
+        ================================= -->
+
         <div
             id="loading"
             class="loading hidden"
@@ -97,13 +109,18 @@
         </div>
 
 
-        <!-- Result -->
+        <!-- ================================
+             RESULT SECTION
+        ================================= -->
+
         <section
             id="resultSection"
             class="result-section hidden"
         >
 
-            <!-- Product Title -->
+
+            <!-- PRODUCT TITLE -->
+
             <div class="product-header">
 
                 <p class="result-label">
@@ -117,7 +134,10 @@
             </div>
 
 
-            <!-- Keunggulan -->
+            <!-- ================================
+                 KEUNGGULAN
+            ================================= -->
+
             <article class="info-card">
 
                 <div class="card-icon">
@@ -138,7 +158,10 @@
             </article>
 
 
-            <!-- Bahan -->
+            <!-- ================================
+                 BAHAN
+            ================================= -->
+
             <article class="info-card">
 
                 <div class="card-icon">
@@ -159,7 +182,10 @@
             </article>
 
 
-            <!-- Fungsi -->
+            <!-- ================================
+                 FUNGSI
+            ================================= -->
+
             <article class="info-card">
 
                 <div class="card-icon">
@@ -180,7 +206,10 @@
             </article>
 
 
-            <!-- Source -->
+            <!-- ================================
+                 SOURCE INFO
+            ================================= -->
+
             <div class="source-info">
 
                 <span>
@@ -189,16 +218,20 @@
 
                 <p>
                     Informasi produk dapat berasal dari database ShoeInfo
-                    atau dibuat menggunakan AI Gemini ketika informasi
-                    belum tersedia di database.
+                    atau dibuat menggunakan AI Gemini apabila informasi
+                    produk belum tersedia di database.
                 </p>
 
             </div>
 
+
         </section>
 
 
-        <!-- Empty State -->
+        <!-- ================================
+             EMPTY STATE
+        ================================= -->
+
         <section
             id="emptyState"
             class="empty-state"
@@ -220,7 +253,10 @@
         </section>
 
 
-        <!-- Footer -->
+        <!-- ================================
+             FOOTER
+        ================================= -->
+
         <footer class="footer">
 
             <p>
@@ -229,10 +265,15 @@
 
         </footer>
 
+
     </main>
 
+
+    <!-- JAVASCRIPT -->
 
     <script src="script.js"></script>
 
 </body>
+
 </html>
+```
