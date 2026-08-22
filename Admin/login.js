@@ -17,10 +17,10 @@ const loginForm =
     document.getElementById("loginForm");
 
 const usernameInput =
-    document.getElementById("username");
+    document.getElementById("adminUsername");
 
 const passwordInput =
-    document.getElementById("password");
+    document.getElementById("adminPassword");
 
 const loginButton =
     document.getElementById("loginButton");
@@ -54,6 +54,7 @@ function showMessage(
     text,
     type = "error"
 ) {
+
     loginMessage.textContent =
         text;
 
@@ -63,10 +64,13 @@ function showMessage(
     );
 
     if (type === "success") {
+
         loginMessage.classList.add(
             "success"
         );
+
     }
+
 }
 
 
@@ -75,6 +79,7 @@ function showMessage(
 ===================================== */
 
 function hideMessage() {
+
     loginMessage.textContent =
         "";
 
@@ -85,6 +90,7 @@ function hideMessage() {
     loginMessage.classList.remove(
         "success"
     );
+
 }
 
 
@@ -96,11 +102,14 @@ async function loginAdmin(
     username,
     password
 ) {
+
     const response =
         await fetch(
             LOGIN_API_URL,
             {
-                method: "POST",
+
+                method:
+                    "POST",
 
                 headers: {
                     "Content-Type":
@@ -112,12 +121,10 @@ async function loginAdmin(
 
                 body:
                     JSON.stringify({
-                        username:
-                            username,
-
-                        password:
-                            password
+                        username: username,
+                        password: password
                     })
+
             }
         );
 
@@ -126,46 +133,53 @@ async function loginAdmin(
 
 
     try {
+
         data =
             await response.json();
 
     } catch (error) {
+
         throw new Error(
             "Backend mengembalikan respons yang tidak valid."
         );
+
     }
 
 
     if (!response.ok) {
+
         throw new Error(
             data.error ||
             data.message ||
             `Login gagal. HTTP ${response.status}`
         );
+
     }
 
 
-    if (
-        data.success !== true
-    ) {
+    if (data.success !== true) {
+
         throw new Error(
             data.error ||
             "Username atau password salah."
         );
+
     }
 
 
     return data;
+
 }
 
 
 /* =====================================
-   SUBMIT FORM LOGIN
+   SUBMIT LOGIN
 ===================================== */
 
 loginForm.addEventListener(
     "submit",
     async function (event) {
+
         event.preventDefault();
 
 
@@ -176,9 +190,8 @@ loginForm.addEventListener(
             passwordInput.value;
 
 
-        /* VALIDASI USERNAME */
-
         if (!username) {
+
             showMessage(
                 "Username wajib diisi."
             );
@@ -186,12 +199,12 @@ loginForm.addEventListener(
             usernameInput.focus();
 
             return;
+
         }
 
 
-        /* VALIDASI PASSWORD */
-
         if (!password) {
+
             showMessage(
                 "Password wajib diisi."
             );
@@ -199,10 +212,9 @@ loginForm.addEventListener(
             passwordInput.focus();
 
             return;
+
         }
 
-
-        /* MULAI LOGIN */
 
         hideMessage();
 
@@ -215,6 +227,7 @@ loginForm.addEventListener(
 
 
         try {
+
             const result =
                 await loginAdmin(
                     username,
@@ -222,16 +235,14 @@ loginForm.addEventListener(
                 );
 
 
-            /* PASTIKAN TOKEN ADA */
-
             if (!result.token) {
+
                 throw new Error(
                     "Token login tidak diterima dari server."
                 );
+
             }
 
-
-            /* SIMPAN TOKEN LOGIN */
 
             localStorage.setItem(
                 "shoeinfo_admin_token",
@@ -239,15 +250,11 @@ loginForm.addEventListener(
             );
 
 
-            /* SIMPAN USERNAME */
-
             localStorage.setItem(
                 "shoeinfo_admin_username",
                 result.username || username
             );
 
-
-            /* PESAN BERHASIL */
 
             showMessage(
                 "Login berhasil. Mengalihkan ke dashboard...",
@@ -255,18 +262,19 @@ loginForm.addEventListener(
             );
 
 
-            /* PINDAH KE ADMIN.HTML */
-
             setTimeout(
                 function () {
+
                     window.location.href =
                         "admin.html";
+
                 },
                 700
             );
 
 
         } catch (error) {
+
             console.error(
                 "Login error:",
                 error
@@ -284,13 +292,14 @@ loginForm.addEventListener(
 
             passwordInput.focus();
 
-
         } finally {
+
             loginButton.disabled =
                 false;
 
             loginButton.textContent =
                 "Masuk ke Dashboard";
+
         }
 
     }
@@ -304,6 +313,8 @@ loginForm.addEventListener(
 window.addEventListener(
     "DOMContentLoaded",
     function () {
+
         usernameInput.focus();
+
     }
 );
