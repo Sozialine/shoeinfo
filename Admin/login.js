@@ -10,309 +10,304 @@ const SUPABASE_KEY =
 
 
 /* =====================================
-   ELEMENT
+   LOGIN
 ===================================== */
 
-const loginForm =
-    document.getElementById("loginForm");
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
 
-const usernameInput =
-    document.getElementById("adminUsername");
+        const loginForm =
+            document.getElementById("loginForm");
 
-const passwordInput =
-    document.getElementById("adminPassword");
+        const usernameInput =
+            document.getElementById("adminUsername");
 
-const loginButton =
-    document.getElementById("loginButton");
+        const passwordInput =
+            document.getElementById("adminPassword");
 
-const loginMessage =
-    document.getElementById("loginMessage");
+        const loginButton =
+            document.getElementById("loginButton");
 
-
-/* =====================================
-   CEK ELEMENT
-===================================== */
-
-if (
-    !loginForm ||
-    !usernameInput ||
-    !passwordInput ||
-    !loginButton ||
-    !loginMessage
-) {
-    console.error(
-        "Element login tidak ditemukan. Periksa login.html."
-    );
-}
+        const loginMessage =
+            document.getElementById("loginMessage");
 
 
-/* =====================================
-   TAMPILKAN PESAN
-===================================== */
+        /* =============================
+           CEK SEMUA ELEMENT
+        ============================== */
 
-function showMessage(
-    text,
-    type = "error"
-) {
+        if (
+            !loginForm ||
+            !usernameInput ||
+            !passwordInput ||
+            !loginButton ||
+            !loginMessage
+        ) {
 
-    loginMessage.textContent =
-        text;
-
-    loginMessage.classList.remove(
-        "hidden",
-        "success"
-    );
-
-    if (type === "success") {
-
-        loginMessage.classList.add(
-            "success"
-        );
-
-    }
-
-}
-
-
-/* =====================================
-   SEMBUNYIKAN PESAN
-===================================== */
-
-function hideMessage() {
-
-    loginMessage.textContent =
-        "";
-
-    loginMessage.classList.add(
-        "hidden"
-    );
-
-    loginMessage.classList.remove(
-        "success"
-    );
-
-}
-
-
-/* =====================================
-   LOGIN KE BACKEND
-===================================== */
-
-async function loginAdmin(
-    username,
-    password
-) {
-
-    const response =
-        await fetch(
-            LOGIN_API_URL,
-            {
-
-                method:
-                    "POST",
-
-                headers: {
-                    "Content-Type":
-                        "application/json",
-
-                    "apikey":
-                        SUPABASE_KEY
-                },
-
-                body:
-                    JSON.stringify({
-                        username: username,
-                        password: password
-                    })
-
-            }
-        );
-
-
-    let data = {};
-
-
-    try {
-
-        data =
-            await response.json();
-
-    } catch (error) {
-
-        throw new Error(
-            "Backend mengembalikan respons yang tidak valid."
-        );
-
-    }
-
-
-    if (!response.ok) {
-
-        throw new Error(
-            data.error ||
-            data.message ||
-            `Login gagal. HTTP ${response.status}`
-        );
-
-    }
-
-
-    if (data.success !== true) {
-
-        throw new Error(
-            data.error ||
-            "Username atau password salah."
-        );
-
-    }
-
-
-    return data;
-
-}
-
-
-/* =====================================
-   SUBMIT LOGIN
-===================================== */
-
-loginForm.addEventListener(
-    "submit",
-    async function (event) {
-
-        event.preventDefault();
-
-
-        const username =
-            usernameInput.value.trim();
-
-        const password =
-            passwordInput.value;
-
-
-        if (!username) {
-
-            showMessage(
-                "Username wajib diisi."
+            console.error(
+                "Element login tidak ditemukan.",
+                {
+                    loginForm,
+                    usernameInput,
+                    passwordInput,
+                    loginButton,
+                    loginMessage
+                }
             );
-
-            usernameInput.focus();
 
             return;
 
         }
 
 
-        if (!password) {
+        /* =============================
+           TAMPILKAN PESAN
+        ============================== */
 
-            showMessage(
-                "Password wajib diisi."
-            );
+        function showMessage(
+            text,
+            type = "error"
+        ) {
 
-            passwordInput.focus();
+            loginMessage.textContent =
+                text;
 
-            return;
-
-        }
-
-
-        hideMessage();
-
-
-        loginButton.disabled =
-            true;
-
-        loginButton.textContent =
-            "Memeriksa...";
-
-
-        try {
-
-            const result =
-                await loginAdmin(
-                    username,
-                    password
-                );
-
-
-            if (!result.token) {
-
-                throw new Error(
-                    "Token login tidak diterima dari server."
-                );
-
-            }
-
-
-            localStorage.setItem(
-                "shoeinfo_admin_token",
-                result.token
-            );
-
-
-            localStorage.setItem(
-                "shoeinfo_admin_username",
-                result.username || username
-            );
-
-
-            showMessage(
-                "Login berhasil. Mengalihkan ke dashboard...",
+            loginMessage.classList.remove(
+                "hidden",
                 "success"
             );
 
 
-            setTimeout(
-                function () {
+            if (type === "success") {
 
-                    window.location.href =
-                        "admin.html";
+                loginMessage.classList.add(
+                    "success"
+                );
 
-                },
-                700
-            );
-
-
-        } catch (error) {
-
-            console.error(
-                "Login error:",
-                error
-            );
-
-
-            showMessage(
-                error.message ||
-                "Terjadi kesalahan saat login."
-            );
-
-
-            passwordInput.value =
-                "";
-
-            passwordInput.focus();
-
-        } finally {
-
-            loginButton.disabled =
-                false;
-
-            loginButton.textContent =
-                "Masuk ke Dashboard";
+            }
 
         }
 
-    }
-);
+
+        /* =============================
+           SEMBUNYIKAN PESAN
+        ============================== */
+
+        function hideMessage() {
+
+            loginMessage.textContent =
+                "";
+
+            loginMessage.classList.add(
+                "hidden"
+            );
+
+            loginMessage.classList.remove(
+                "success"
+            );
+
+        }
 
 
-/* =====================================
-   FOCUS USERNAME
-===================================== */
+        /* =============================
+           SUBMIT LOGIN
+        ============================== */
 
-window.addEventListener(
-    "DOMContentLoaded",
-    function () {
+        loginForm.addEventListener(
+            "submit",
+            async function (event) {
+
+                event.preventDefault();
+
+
+                const username =
+                    usernameInput.value.trim();
+
+                const password =
+                    passwordInput.value;
+
+
+                /* VALIDASI */
+
+                if (!username) {
+
+                    showMessage(
+                        "Username wajib diisi."
+                    );
+
+                    usernameInput.focus();
+
+                    return;
+
+                }
+
+
+                if (!password) {
+
+                    showMessage(
+                        "Password wajib diisi."
+                    );
+
+                    passwordInput.focus();
+
+                    return;
+
+                }
+
+
+                /* MULAI LOGIN */
+
+                hideMessage();
+
+                loginButton.disabled =
+                    true;
+
+                loginButton.textContent =
+                    "Memeriksa...";
+
+
+                try {
+
+                    const response =
+                        await fetch(
+                            LOGIN_API_URL,
+                            {
+
+                                method:
+                                    "POST",
+
+                                headers: {
+
+                                    "Content-Type":
+                                        "application/json",
+
+                                    "apikey":
+                                        SUPABASE_KEY
+
+                                },
+
+                                body:
+                                    JSON.stringify({
+
+                                        username:
+                                            username,
+
+                                        password:
+                                            password
+
+                                    })
+
+                            }
+                        );
+
+
+                    let data = {};
+
+
+                    try {
+
+                        data =
+                            await response.json();
+
+                    } catch (error) {
+
+                        throw new Error(
+                            "Respons backend tidak valid."
+                        );
+
+                    }
+
+
+                    if (!response.ok) {
+
+                        throw new Error(
+                            data.error ||
+                            data.message ||
+                            `Login gagal. HTTP ${response.status}`
+                        );
+
+                    }
+
+
+                    if (
+                        data.success !== true
+                    ) {
+
+                        throw new Error(
+                            data.error ||
+                            "Username atau password salah."
+                        );
+
+                    }
+
+
+                    if (!data.token) {
+
+                        throw new Error(
+                            "Token login tidak diterima."
+                        );
+
+                    }
+
+
+                    /* SIMPAN TOKEN */
+
+                    localStorage.setItem(
+                        "shoeinfo_admin_token",
+                        data.token
+                    );
+
+
+                    localStorage.setItem(
+                        "shoeinfo_admin_username",
+                        data.username || username
+                    );
+
+
+                    showMessage(
+                        "Login berhasil. Mengalihkan...",
+                        "success"
+                    );
+
+
+                    setTimeout(
+                        function () {
+
+                            window.location.href =
+                                "admin.html";
+
+                        },
+                        700
+                    );
+
+
+                } catch (error) {
+
+                    console.error(
+                        "Login error:",
+                        error
+                    );
+
+
+                    showMessage(
+                        error.message ||
+                        "Terjadi kesalahan saat login."
+                    );
+
+                } finally {
+
+                    loginButton.disabled =
+                        false;
+
+                    loginButton.textContent =
+                        "Masuk ke Dashboard";
+
+                }
+
+            }
+        );
+
 
         usernameInput.focus();
 
