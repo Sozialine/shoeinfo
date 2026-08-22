@@ -5,6 +5,9 @@
 const API_URL =
     "https://kqwfxglzelhdjsxeceld.supabase.co/functions/v1/search-shoe";
 
+const SUGGESTIONS_API_URL =
+    "https://kqwfxglzelhdjsxeceld.supabase.co/functions/v1/search-suggestions";
+
 const SUPABASE_ANON_KEY =
     "sb_publishable_PQbg0iClbuSLCjurjMT_Nw_-YjIply-";
 
@@ -40,6 +43,20 @@ const materials =
 const functions =
     document.getElementById("functions");
 
+const suggestions =
+    document.getElementById("suggestions");
+
+
+/* =====================================
+   STATE
+===================================== */
+
+let suggestionTimer = null;
+
+let lastSuggestionQuery = "";
+
+let isSelectingSuggestion = false;
+
 
 /* =====================================
    SEARCH FUNCTION
@@ -51,7 +68,6 @@ async function searchShoe() {
         shoeInput.value.trim();
 
 
-    // Validasi input
     if (!query) {
 
         alert(
@@ -65,16 +81,20 @@ async function searchShoe() {
     }
 
 
+    // Sembunyikan rekomendasi saat pencarian
+    hideSuggestions();
+
+
     // Tampilkan loading
-    emptyState?.classList.add(
+    emptyState.classList.add(
         "hidden"
     );
 
-    resultSection?.classList.add(
+    resultSection.classList.add(
         "hidden"
     );
 
-    loading?.classList.remove(
+    loading.classList.remove(
         "hidden"
     );
 
@@ -85,95 +105,56 @@ async function searchShoe() {
 
     try {
 
-        console.log(
-            "Mencari produk:",
-            query
-        );
-
-
-        // Request ke Supabase Edge Function
         const response =
-            await fetch(API_URL, {
+            await fetch(
+                API_URL,
+                {
+                    method: "POST",
 
-                method: "POST",
+                    headers: {
+                        "Content-Type":
+                            "application/json",
 
-                headers: {
-                    "Content-Type":
-                        "application/json",
+                        "apikey":
+                            SUPABASE_ANON_KEY,
+                    },
 
-                    "apikey":
-                        SUPABASE_ANON_KEY,
-                },
-
-                body:
-                    JSON.stringify({
-                        query: query
+                    body: JSON.stringify({
+                        query: query,
                     }),
-
-            });
-
-
-        // Ambil response
-        let data;
-
-        try {
-
-            data =
-                await response.json();
-
-        } catch {
-
-            throw new Error(
-                "Server tidak mengembalikan JSON yang valid."
+                }
             );
 
-        }
+
+        const data =
+            await response.json();
 
 
         console.log(
-            "HTTP Status:",
-            response.status
-        );
-
-        console.log(
-            "Response ShoeInfo:",
+            "Search response:",
             data
         );
 
 
-        // =====================================
-        // ERROR DARI SERVER
-        // =====================================
-
         if (!response.ok) {
 
             throw new Error(
-                data?.error ||
-                data?.message ||
-                `Terjadi kesalahan pada server (${response.status}).`
+                data.error ||
+                data.message ||
+                `HTTP Error ${response.status}`
             );
 
         }
 
 
-        // =====================================
-        // PRODUK DITEMUKAN
-        // =====================================
-
         if (
-            data?.success === true &&
-            data?.found === true &&
-            data?.product
+            data.success === true &&
+            data.found === true &&
+            data.product
         ) {
 
             showResult(
                 data.product
-            );
-
-            console.log(
-                data.cached
-                    ? "Produk ditemukan dari database."
-                    : "Produk berhasil dibuat oleh Gemini."
             );
 
             return;
@@ -181,13 +162,8 @@ async function searchShoe() {
         }
 
 
-        // =====================================
-        // PRODUK TIDAK DITEMUKAN
-        // =====================================
-
         showNotFound(
-            query,
-            data?.message
+            query
         );
 
 
@@ -198,26 +174,267 @@ async function searchShoe() {
             error
         );
 
-
         showError(
-            error?.message ||
-            "Terjadi kesalahan saat menghubungkan ke ShoeInfo."
+            error.message ||
+            "Terjadi kesalahan koneksi."
         );
-
 
     } finally {
 
-        // Sembunyikan loading
-        loading?.classList.add(
+        loading.classList.add(
             "hidden"
         );
 
-
-        // Aktifkan kembali tombol
         searchButton.disabled =
             false;
 
     }
+
+}
+
+
+/* =====================================
+   GET AI SUGGESTIONS
+===================================== */
+
+async function getSuggestions(query) {
+
+    const cleanQuery =
+        query.trim();
+
+
+    if (
+        cleanQuery.length < 2
+    ) {
+
+        hideSuggestions();
+
+        return;
+
+    }
+
+
+    // Hindari request yang sama
+    if (
+        cleanQuery.toLowerCase() ===
+        lastSuggestionQuery.toLowerCase()
+    ) {
+        return;
+    }
+
+
+    lastSuggestionQuery =
+        cleanQuery;
+
+
+    try {
+
+        const response =
+            await fetch(
+                SUGGESTIONS_API_URL,
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json",
+
+                        "apikey":
+                            SUPABASE_ANON_KEY,
+                    },
+
+                    body: JSON.stringify({
+                        query:
+                            cleanQuery,
+                    }),
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        console.log(
+            "Suggestions response:",
+            data
+        );
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                data.error ||
+                `HTTP Error ${response.status}`
+            );
+
+        }
+
+
+        // Pastikan input belum berubah
+        // selama request berjalan
+        if (
+            shoeInput.value.trim()
+            !== cleanQuery
+        ) {
+            return;
+        }
+
+
+        if (
+            data.success === true &&
+            Array.isArray(
+                data.suggestions
+            ) &&
+            data.suggestions.length > 0
+        ) {
+
+            showSuggestions(
+                data.suggestions
+            );
+
+        } else {
+
+            hideSuggestions();
+
+        }
+
+
+    } catch (error) {
+
+        console.error(
+            "Suggestions error:",
+            error
+        );
+
+        // Jangan tampilkan error ke pengguna
+        // karena fitur utama pencarian
+        // tetap bisa digunakan
+        hideSuggestions();
+
+    }
+
+}
+
+
+/* =====================================
+   SHOW SUGGESTIONS
+===================================== */
+
+function showSuggestions(items) {
+
+    if (!suggestions) {
+        return;
+    }
+
+
+    suggestions.innerHTML =
+        "";
+
+
+    const title =
+        document.createElement("div");
+
+    title.className =
+        "suggestion-title";
+
+    title.textContent =
+        "Rekomendasi pencarian";
+
+    suggestions.appendChild(
+        title
+    );
+
+
+    items.forEach(
+        (item) => {
+
+            const button =
+                document.createElement(
+                    "button"
+                );
+
+            button.type =
+                "button";
+
+            button.className =
+                "suggestion-item";
+
+            button.textContent =
+                item;
+
+
+            button.addEventListener(
+                "click",
+                function () {
+
+                    isSelectingSuggestion =
+                        true;
+
+
+                    shoeInput.value =
+                        item;
+
+
+                    hideSuggestions();
+
+
+                    // Reset agar input baru
+                    // dapat meminta rekomendasi
+                    lastSuggestionQuery =
+                        "";
+
+
+                    // Langsung cari
+                    searchShoe();
+
+
+                    setTimeout(
+                        () => {
+
+                            isSelectingSuggestion =
+                                false;
+
+                        },
+                        100
+                    );
+
+                }
+            );
+
+
+            suggestions.appendChild(
+                button
+            );
+
+        }
+    );
+
+
+    suggestions.classList.remove(
+        "hidden"
+    );
+
+}
+
+
+/* =====================================
+   HIDE SUGGESTIONS
+===================================== */
+
+function hideSuggestions() {
+
+    if (!suggestions) {
+        return;
+    }
+
+
+    suggestions.classList.add(
+        "hidden"
+    );
+
+    suggestions.innerHTML =
+        "";
 
 }
 
@@ -229,45 +446,34 @@ async function searchShoe() {
 function showResult(shoe) {
 
     productName.textContent =
-        shoe?.name ||
+        shoe.name ||
         "Nama produk tidak tersedia";
 
 
-    // Render keunggulan
     renderList(
         advantages,
-        shoe?.advantages,
+        shoe.advantages,
         "Informasi keunggulan belum tersedia."
     );
 
 
-    // Render bahan
     renderList(
         materials,
-        shoe?.materials,
+        shoe.materials,
         "Informasi bahan belum tersedia."
     );
 
 
-    // Render fungsi
     renderList(
         functions,
-        shoe?.functions,
+        shoe.functions,
         "Informasi fungsi belum tersedia."
     );
 
 
-    // Tampilkan hasil
     resultSection.classList.remove(
         "hidden"
     );
-
-
-    // Scroll ke hasil
-    resultSection.scrollIntoView({
-        behavior: "smooth",
-        block: "start"
-    });
 
 }
 
@@ -282,17 +488,10 @@ function renderList(
     emptyMessage
 ) {
 
-    if (!container) {
-        return;
-    }
-
-
-    // Bersihkan isi sebelumnya
     container.innerHTML =
         "";
 
 
-    // Jika data kosong
     if (
         !Array.isArray(items) ||
         items.length === 0
@@ -308,18 +507,8 @@ function renderList(
     }
 
 
-    // Tambahkan setiap item
     items.forEach(
-        function (item) {
-
-            if (
-                item === null ||
-                item === undefined ||
-                String(item).trim() === ""
-            ) {
-                return;
-            }
-
+        (item) => {
 
             addListItem(
                 container,
@@ -333,44 +522,39 @@ function renderList(
 
 
 /* =====================================
-   SHOW NOT FOUND
+   NOT FOUND
 ===================================== */
 
-function showNotFound(
-    query,
-    message
-) {
+function showNotFound(query) {
 
     productName.textContent =
         "Informasi tidak ditemukan";
 
 
-    advantages.innerHTML =
-        "";
-
-    materials.innerHTML =
-        "";
-
-    functions.innerHTML =
-        "";
-
-
-    addListItem(
+    renderList(
         advantages,
-        message ||
-        `Data untuk "${query}" belum tersedia.`
+        [
+            `Data untuk "${query}" belum tersedia.`,
+        ],
+        ""
     );
 
 
-    addListItem(
+    renderList(
         materials,
-        "Informasi bahan belum tersedia."
+        [
+            "Informasi bahan belum tersedia.",
+        ],
+        ""
     );
 
 
-    addListItem(
+    renderList(
         functions,
-        "Informasi fungsi belum tersedia."
+        [
+            "Coba gunakan nama produk yang lebih spesifik.",
+        ],
+        ""
     );
 
 
@@ -382,7 +566,7 @@ function showNotFound(
 
 
 /* =====================================
-   SHOW ERROR
+   ERROR
 ===================================== */
 
 function showError(message) {
@@ -391,32 +575,31 @@ function showError(message) {
         "Terjadi kesalahan koneksi";
 
 
-    advantages.innerHTML =
-        "";
-
-    materials.innerHTML =
-        "";
-
-    functions.innerHTML =
-        "";
-
-
-    addListItem(
+    renderList(
         advantages,
-        message ||
-        "Frontend belum dapat terhubung ke backend."
+        [
+            message ||
+            "Frontend belum dapat terhubung ke backend.",
+        ],
+        ""
     );
 
 
-    addListItem(
+    renderList(
         materials,
-        "Periksa koneksi internet dan konfigurasi backend."
+        [
+            "Silakan periksa koneksi dan konfigurasi backend.",
+        ],
+        ""
     );
 
 
-    addListItem(
+    renderList(
         functions,
-        "Silakan coba lakukan pencarian kembali."
+        [
+            "Coba lakukan pencarian kembali.",
+        ],
+        ""
     );
 
 
@@ -428,7 +611,7 @@ function showError(message) {
 
 
 /* =====================================
-   HELPER: TAMBAH LIST ITEM
+   HELPER
 ===================================== */
 
 function addListItem(
@@ -436,18 +619,13 @@ function addListItem(
     text
 ) {
 
-    if (!container) {
-        return;
-    }
-
-
     const li =
-        document.createElement("li");
-
+        document.createElement(
+            "li"
+        );
 
     li.textContent =
         text;
-
 
     container.appendChild(
         li
@@ -457,12 +635,71 @@ function addListItem(
 
 
 /* =====================================
-   BUTTON EVENT
+   INPUT EVENT
+   DEBOUNCE 500ms
+===================================== */
+
+shoeInput.addEventListener(
+    "input",
+    function () {
+
+        if (
+            isSelectingSuggestion
+        ) {
+            return;
+        }
+
+
+        clearTimeout(
+            suggestionTimer
+        );
+
+
+        const query =
+            shoeInput.value.trim();
+
+
+        if (
+            query.length < 2
+        ) {
+
+            lastSuggestionQuery =
+                "";
+
+            hideSuggestions();
+
+            return;
+
+        }
+
+
+        suggestionTimer =
+            setTimeout(
+                function () {
+
+                    getSuggestions(
+                        query
+                    );
+
+                },
+                500
+            );
+
+    }
+);
+
+
+/* =====================================
+   SEARCH BUTTON
 ===================================== */
 
 searchButton.addEventListener(
     "click",
-    searchShoe
+    function () {
+
+        searchShoe();
+
+    }
 );
 
 
@@ -481,6 +718,33 @@ shoeInput.addEventListener(
             event.preventDefault();
 
             searchShoe();
+
+        }
+
+    }
+);
+
+
+/* =====================================
+   HIDE SUGGESTIONS
+   SAAT KLIK DI LUAR
+===================================== */
+
+document.addEventListener(
+    "click",
+    function (event) {
+
+        const target =
+            event.target;
+
+
+        if (
+            !target.closest(
+                ".search-section"
+            )
+        ) {
+
+            hideSuggestions();
 
         }
 
