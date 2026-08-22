@@ -20,11 +20,11 @@ document.addEventListener(
         const loginForm =
             document.getElementById("loginForm");
 
-        const usernameInput =
-            document.getElementById("adminUsername");
+       const usernameInput =
+    document.getElementById("username");
 
-        const passwordInput =
-            document.getElementById("adminPassword");
+const passwordInput =
+    document.getElementById("password");
 
         const loginButton =
             document.getElementById("loginButton");
