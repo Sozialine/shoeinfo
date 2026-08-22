@@ -849,3 +849,54 @@ tbody tr:hover {
     }
 
 }
+
+/* =====================================
+   PAGINATION
+===================================== */
+
+.pagination {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 20px;
+    padding: 10px 0;
+}
+
+.pagination-info {
+    text-align: center;
+    font-size: 14px;
+    color: #666;
+}
+
+.pagination-buttons {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.pagination-button {
+    border: 1px solid #ddd;
+    background: #fff;
+    color: #333;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.pagination-button:hover:not(:disabled) {
+    background: #f2f2f2;
+}
+
+.pagination-button.active {
+    font-weight: 600;
+}
+
+.pagination-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}

@@ -1,4 +1,3 @@
-
 /* =====================================
    CONFIG
 ===================================== */
@@ -108,6 +107,24 @@ const formTitle =
 const message =
     document.getElementById("message");
 
+const pagination =
+    document.getElementById("pagination");
+
+
+/* =====================================
+   PAGINATION
+===================================== */
+
+const PRODUCTS_PER_PAGE = 10;
+
+let currentPage = 1;
+
+let totalProductCount = 0;
+
+
+/* =====================================
+   DATA PRODUK
+===================================== */
 
 let products = [];
 
@@ -151,7 +168,9 @@ function showLogin() {
     );
 
     if (usernameInput) {
+
         usernameInput.focus();
+
     }
 
 }
@@ -449,6 +468,8 @@ logoutButton.addEventListener(
         passwordInput.value =
             "";
 
+        hideLoginMessage();
+
         showLogin();
 
     }
@@ -461,15 +482,35 @@ logoutButton.addEventListener(
 
 async function loadProducts() {
 
-    const { data, error } =
+    const from =
+        (currentPage - 1) *
+        PRODUCTS_PER_PAGE;
+
+
+    const to =
+        from +
+        PRODUCTS_PER_PAGE -
+        1;
+
+
+    const { data, count, error } =
         await supabaseClient
             .from("products")
-            .select("*")
+            .select(
+                "*",
+                {
+                    count: "exact"
+                }
+            )
             .order(
                 "created_at",
                 {
                     ascending: false
                 }
+            )
+            .range(
+                from,
+                to
             );
 
 
@@ -492,9 +533,43 @@ async function loadProducts() {
         data || [];
 
 
+    totalProductCount =
+        count || 0;
+
+
+    /*
+       Jika halaman sekarang sudah
+       tidak memiliki data, kembali
+       ke halaman terakhir yang tersedia.
+    */
+
+    const totalPages =
+        Math.ceil(
+            totalProductCount /
+            PRODUCTS_PER_PAGE
+        );
+
+
+    if (
+        totalPages > 0 &&
+        currentPage > totalPages
+    ) {
+
+        currentPage =
+            totalPages;
+
+        await loadProducts();
+
+        return;
+
+    }
+
+
     renderProducts(products);
 
-    updateStats(products);
+    renderPagination();
+
+    await updateStats();
 
 }
 
@@ -587,27 +662,297 @@ function renderProducts(data) {
 
 
 /* =====================================
+   PAGINATION
+===================================== */
+
+function renderPagination() {
+
+    pagination.innerHTML =
+        "";
+
+
+    const totalPages =
+        Math.ceil(
+            totalProductCount /
+            PRODUCTS_PER_PAGE
+        );
+
+
+    if (totalPages <= 1) {
+
+        return;
+
+    }
+
+
+    /*
+       INFORMASI DATA
+    */
+
+    const start =
+        (
+            (currentPage - 1) *
+            PRODUCTS_PER_PAGE
+        ) + 1;
+
+
+    const end =
+        Math.min(
+            currentPage *
+                PRODUCTS_PER_PAGE,
+            totalProductCount
+        );
+
+
+    const info =
+        document.createElement(
+            "span"
+        );
+
+
+    info.className =
+        "pagination-info";
+
+
+    info.textContent =
+        `Menampilkan ${start}–${end} dari ${totalProductCount} produk`;
+
+
+    pagination.appendChild(
+        info
+    );
+
+
+    /*
+       CONTAINER TOMBOL
+    */
+
+    const buttonsContainer =
+        document.createElement(
+            "div"
+        );
+
+
+    buttonsContainer.className =
+        "pagination-buttons";
+
+
+    /*
+       TOMBOL SEBELUMNYA
+    */
+
+    const previousButton =
+        document.createElement(
+            "button"
+        );
+
+
+    previousButton.type =
+        "button";
+
+
+    previousButton.textContent =
+        "← Sebelumnya";
+
+
+    previousButton.className =
+        "pagination-button";
+
+
+    previousButton.disabled =
+        currentPage === 1;
+
+
+    previousButton.addEventListener(
+        "click",
+        function () {
+
+            if (
+                currentPage > 1
+            ) {
+
+                currentPage--;
+
+                loadProducts();
+
+            }
+
+        }
+    );
+
+
+    buttonsContainer.appendChild(
+        previousButton
+    );
+
+
+    /*
+       NOMOR HALAMAN
+    */
+
+    for (
+        let page = 1;
+        page <= totalPages;
+        page++
+    ) {
+
+        const pageButton =
+            document.createElement(
+                "button"
+            );
+
+
+        pageButton.type =
+            "button";
+
+
+        pageButton.textContent =
+            page;
+
+
+        pageButton.className =
+            "pagination-button";
+
+
+        if (
+            page === currentPage
+        ) {
+
+            pageButton.classList.add(
+                "active"
+            );
+
+        }
+
+
+        pageButton.addEventListener(
+            "click",
+            function () {
+
+                currentPage =
+                    page;
+
+                loadProducts();
+
+            }
+        );
+
+
+        buttonsContainer.appendChild(
+            pageButton
+        );
+
+    }
+
+
+    /*
+       TOMBOL BERIKUTNYA
+    */
+
+    const nextButton =
+        document.createElement(
+            "button"
+        );
+
+
+    nextButton.type =
+        "button";
+
+
+    nextButton.textContent =
+        "Berikutnya →";
+
+
+    nextButton.className =
+        "pagination-button";
+
+
+    nextButton.disabled =
+        currentPage >=
+        totalPages;
+
+
+    nextButton.addEventListener(
+        "click",
+        function () {
+
+            if (
+                currentPage <
+                totalPages
+            ) {
+
+                currentPage++;
+
+                loadProducts();
+
+            }
+
+        }
+    );
+
+
+    buttonsContainer.appendChild(
+        nextButton
+    );
+
+
+    pagination.appendChild(
+        buttonsContainer
+    );
+
+}
+
+
+/* =====================================
    UPDATE STATISTICS
 ===================================== */
 
-function updateStats(data) {
+async function updateStats() {
+
+    const { data, error } =
+        await supabaseClient
+            .from("products")
+            .select(
+                "ai_generated"
+            );
+
+
+    if (error) {
+
+        console.error(
+            "Gagal mengambil statistik:",
+            error
+        );
+
+        return;
+
+    }
+
+
+    const allProducts =
+        data || [];
+
 
     totalProducts.textContent =
-        data.length;
+        allProducts.length;
 
 
     manualProducts.textContent =
-        data.filter(
+        allProducts.filter(
             function (product) {
+
                 return !product.ai_generated;
+
             }
         ).length;
 
 
     aiProducts.textContent =
-        data.filter(
+        allProducts.filter(
             function (product) {
+
                 return product.ai_generated;
+
             }
         ).length;
 
@@ -701,7 +1046,9 @@ productForm.addEventListener(
 
         if (result.error) {
 
-            console.error(result.error);
+            console.error(
+                result.error
+            );
 
             showMessage(
                 "Gagal menyimpan: " +
@@ -723,6 +1070,20 @@ productForm.addEventListener(
 
         resetForm();
 
+
+        /*
+           Setelah tambah produk,
+           kembali ke halaman pertama
+           agar produk terbaru terlihat.
+        */
+
+        if (!id) {
+
+            currentPage = 1;
+
+        }
+
+
         await loadProducts();
 
     }
@@ -739,13 +1100,17 @@ window.editProduct =
         const product =
             products.find(
                 function (item) {
+
                     return item.id === id;
+
                 }
             );
 
 
         if (!product) {
+
             return;
+
         }
 
 
@@ -802,13 +1167,17 @@ window.deleteProduct =
         const product =
             products.find(
                 function (item) {
+
                     return item.id === id;
+
                 }
             );
 
 
         if (!product) {
+
             return;
+
         }
 
 
@@ -819,7 +1188,9 @@ window.deleteProduct =
 
 
         if (!confirmDelete) {
+
             return;
+
         }
 
 
@@ -909,7 +1280,9 @@ searchProducts.addEventListener(
             );
 
 
-        renderProducts(filtered);
+        renderProducts(
+            filtered
+        );
 
     }
 );
@@ -948,7 +1321,9 @@ function textToArray(text) {
         .split("\n")
         .map(
             function (item) {
+
                 return item.trim();
+
             }
         )
         .filter(Boolean);
@@ -963,7 +1338,9 @@ function textToArray(text) {
 function arrayToText(array) {
 
     if (!Array.isArray(array)) {
+
         return "";
+
     }
 
     return array.join("\n");
