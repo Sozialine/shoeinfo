@@ -1,9 +1,12 @@
 /* =====================================
    CONFIG BACKEND API
-   ===================================== */
+===================================== */
 
 const API_URL =
     "https://kqwfxglzelhdjsxeceld.supabase.co/functions/v1/search-shoe";
+
+const SUPABASE_ANON_KEY =
+    "sb_publishable_PQbg0iClbuSLCjurjMT_Nw_-YjIply-";
 
 
 /* =====================================
@@ -62,71 +65,95 @@ async function searchShoe() {
     }
 
 
-    // =====================================
-    // TAMPILKAN LOADING
-    // =====================================
-
-    emptyState.classList.add(
+    // Tampilkan loading
+    emptyState?.classList.add(
         "hidden"
     );
 
-    resultSection.classList.add(
+    resultSection?.classList.add(
         "hidden"
     );
 
-    loading.classList.remove(
+    loading?.classList.remove(
         "hidden"
     );
 
 
-    // Nonaktifkan tombol saat request berjalan
+    // Nonaktifkan tombol
     searchButton.disabled = true;
 
 
     try {
 
+        console.log(
+            "Mencari produk:",
+            query
+        );
+
+
+        // Request ke Supabase Edge Function
+        const response =
+            await fetch(API_URL, {
+
+                method: "POST",
+
+                headers: {
+                    "Content-Type":
+                        "application/json",
+
+                    "apikey":
+                        SUPABASE_ANON_KEY,
+                },
+
+                body:
+                    JSON.stringify({
+                        query: query
+                    }),
+
+            });
+
+
+        // Ambil response
+        let data;
+
+        try {
+
+            data =
+                await response.json();
+
+        } catch {
+
+            throw new Error(
+                "Server tidak mengembalikan JSON yang valid."
+            );
+
+        }
+
+
+        console.log(
+            "HTTP Status:",
+            response.status
+        );
+
+        console.log(
+            "Response ShoeInfo:",
+            data
+        );
+
+
         // =====================================
-        // REQUEST KE EDGE FUNCTION
+        // ERROR DARI SERVER
         // =====================================
 
-       const response = await fetch(API_URL, {
+        if (!response.ok) {
 
-    method: "POST",
+            throw new Error(
+                data?.error ||
+                data?.message ||
+                `Terjadi kesalahan pada server (${response.status}).`
+            );
 
-    headers: {
-        "Content-Type": "application/json",
-        "apikey": "sb_publishable_PQbg0iClbuSLCjurjMT_Nw_-YjIply-"
-    },
-
-    body: JSON.stringify({
-        query: query
-    })
-
-});
-
-
-        // Ambil response dengan aman
-        const data = await response.json();
-
-console.log("Status:", response.status);
-console.log("Response API:", data);
-
-
-        // =====================================
-        // SERVER ERROR
-        // =====================================
-
-       if (!response.ok) {
-
-    console.error("API Error:", data);
-
-    throw new Error(
-        data.error ||
-        data.message ||
-        `HTTP Error ${response.status}`
-    );
-
-}
+        }
 
 
         // =====================================
@@ -134,13 +161,19 @@ console.log("Response API:", data);
         // =====================================
 
         if (
-            data.success === true &&
-            data.found === true &&
-            data.product
+            data?.success === true &&
+            data?.found === true &&
+            data?.product
         ) {
 
             showResult(
                 data.product
+            );
+
+            console.log(
+                data.cached
+                    ? "Produk ditemukan dari database."
+                    : "Produk berhasil dibuat oleh Gemini."
             );
 
             return;
@@ -153,7 +186,8 @@ console.log("Response API:", data);
         // =====================================
 
         showNotFound(
-            query
+            query,
+            data?.message
         );
 
 
@@ -164,23 +198,24 @@ console.log("Response API:", data);
             error
         );
 
+
         showError(
-            error.message
+            error?.message ||
+            "Terjadi kesalahan saat menghubungkan ke ShoeInfo."
         );
+
 
     } finally {
 
-        // =====================================
-        // SELALU SEMBUNYIKAN LOADING
-        // =====================================
-
-        loading.classList.add(
+        // Sembunyikan loading
+        loading?.classList.add(
             "hidden"
         );
 
 
         // Aktifkan kembali tombol
-        searchButton.disabled = false;
+        searchButton.disabled =
+            false;
 
     }
 
@@ -193,50 +228,31 @@ console.log("Response API:", data);
 
 function showResult(shoe) {
 
-    // =====================================
-    // NAMA PRODUK
-    // =====================================
-
     productName.textContent =
-        shoe.name ||
+        shoe?.name ||
         "Nama produk tidak tersedia";
 
 
-    // Bersihkan hasil lama
-    advantages.innerHTML = "";
-    materials.innerHTML = "";
-    functions.innerHTML = "";
-
-
-    // =====================================
-    // KEUNGGULAN
-    // =====================================
-
+    // Render keunggulan
     renderList(
         advantages,
-        shoe.advantages,
+        shoe?.advantages,
         "Informasi keunggulan belum tersedia."
     );
 
 
-    // =====================================
-    // MATERIAL
-    // =====================================
-
+    // Render bahan
     renderList(
         materials,
-        shoe.materials,
+        shoe?.materials,
         "Informasi bahan belum tersedia."
     );
 
 
-    // =====================================
-    // FUNGSI
-    // =====================================
-
+    // Render fungsi
     renderList(
         functions,
-        shoe.functions,
+        shoe?.functions,
         "Informasi fungsi belum tersedia."
     );
 
@@ -245,6 +261,13 @@ function showResult(shoe) {
     resultSection.classList.remove(
         "hidden"
     );
+
+
+    // Scroll ke hasil
+    resultSection.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+    });
 
 }
 
@@ -259,61 +282,82 @@ function renderList(
     emptyMessage
 ) {
 
-    container.innerHTML = "";
+    if (!container) {
+        return;
+    }
 
 
+    // Bersihkan isi sebelumnya
+    container.innerHTML =
+        "";
+
+
+    // Jika data kosong
     if (
         !Array.isArray(items) ||
         items.length === 0
     ) {
 
-        const li =
-            document.createElement("li");
-
-        li.textContent =
-            emptyMessage;
-
-        container.appendChild(li);
+        addListItem(
+            container,
+            emptyMessage
+        );
 
         return;
 
     }
 
 
-    items.forEach(item => {
+    // Tambahkan setiap item
+    items.forEach(
+        function (item) {
 
-        const li =
-            document.createElement("li");
+            if (
+                item === null ||
+                item === undefined ||
+                String(item).trim() === ""
+            ) {
+                return;
+            }
 
-        li.textContent =
-            String(item);
 
-        container.appendChild(li);
+            addListItem(
+                container,
+                String(item)
+            );
 
-    });
+        }
+    );
 
 }
 
 
 /* =====================================
-   NOT FOUND
+   SHOW NOT FOUND
 ===================================== */
 
-function showNotFound(query) {
+function showNotFound(
+    query,
+    message
+) {
 
     productName.textContent =
         "Informasi tidak ditemukan";
 
 
-    advantages.innerHTML = "";
+    advantages.innerHTML =
+        "";
 
-    materials.innerHTML = "";
+    materials.innerHTML =
+        "";
 
-    functions.innerHTML = "";
+    functions.innerHTML =
+        "";
 
 
     addListItem(
         advantages,
+        message ||
         `Data untuk "${query}" belum tersedia.`
     );
 
@@ -338,7 +382,7 @@ function showNotFound(query) {
 
 
 /* =====================================
-   ERROR
+   SHOW ERROR
 ===================================== */
 
 function showError(message) {
@@ -347,11 +391,14 @@ function showError(message) {
         "Terjadi kesalahan koneksi";
 
 
-    advantages.innerHTML = "";
+    advantages.innerHTML =
+        "";
 
-    materials.innerHTML = "";
+    materials.innerHTML =
+        "";
 
-    functions.innerHTML = "";
+    functions.innerHTML =
+        "";
 
 
     addListItem(
@@ -363,13 +410,13 @@ function showError(message) {
 
     addListItem(
         materials,
-        "Silakan periksa koneksi dan konfigurasi backend."
+        "Periksa koneksi internet dan konfigurasi backend."
     );
 
 
     addListItem(
         functions,
-        "Coba lakukan pencarian kembali."
+        "Silakan coba lakukan pencarian kembali."
     );
 
 
@@ -389,13 +436,22 @@ function addListItem(
     text
 ) {
 
+    if (!container) {
+        return;
+    }
+
+
     const li =
         document.createElement("li");
+
 
     li.textContent =
         text;
 
-    container.appendChild(li);
+
+    container.appendChild(
+        li
+    );
 
 }
 
