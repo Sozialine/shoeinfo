@@ -10,10 +10,9 @@
         content="width=device-width, initial-scale=1.0"
     >
 
-    <title>
-        ShoeInfo - Admin
-    </title>
+    <title>ShoeInfo - Admin</title>
 
+    <!-- CSS berada di dalam folder Admin -->
     <link
         rel="stylesheet"
         href="admin.css"
@@ -111,9 +110,7 @@
     >
 
 
-        <!-- =====================================
-             HEADER
-        ====================================== -->
+        <!-- HEADER -->
 
         <header class="admin-header">
 
@@ -154,18 +151,13 @@
 
 
 
-        <!-- =====================================
-             STATISTIK
-        ====================================== -->
+        <!-- STATISTIK -->
 
         <section class="stats">
 
-
             <div class="stat-card">
 
-                <span>
-                    Total Produk
-                </span>
+                <span>Total Produk</span>
 
                 <strong id="totalProducts">
                     0
@@ -174,12 +166,9 @@
             </div>
 
 
-
             <div class="stat-card">
 
-                <span>
-                    Produk Manual
-                </span>
+                <span>Produk Manual</span>
 
                 <strong id="manualProducts">
                     0
@@ -188,12 +177,9 @@
             </div>
 
 
-
             <div class="stat-card">
 
-                <span>
-                    Produk AI
-                </span>
+                <span>Produk AI</span>
 
                 <strong id="aiProducts">
                     0
@@ -201,17 +187,13 @@
 
             </div>
 
-
         </section>
 
 
 
-        <!-- =====================================
-             FORM PRODUK
-        ====================================== -->
+        <!-- FORM PRODUK -->
 
         <section class="panel">
-
 
             <div class="panel-header">
 
@@ -230,9 +212,7 @@
             </div>
 
 
-
             <form id="productForm">
-
 
                 <input
                     type="hidden"
@@ -240,9 +220,7 @@
                 >
 
 
-
                 <div class="form-grid">
-
 
                     <div class="form-group">
 
@@ -257,7 +235,6 @@
                         >
 
                     </div>
-
 
 
                     <div class="form-group">
@@ -276,7 +253,6 @@
                     </div>
 
 
-
                     <div class="form-group">
 
                         <label for="brand">
@@ -290,7 +266,6 @@
                         >
 
                     </div>
-
 
 
                     <div class="form-group">
@@ -307,9 +282,7 @@
 
                     </div>
 
-
                 </div>
-
 
 
                 <div class="form-group">
@@ -330,7 +303,6 @@
                 </div>
 
 
-
                 <div class="form-group">
 
                     <label for="materials">
@@ -345,7 +317,6 @@
                 </div>
 
 
-
                 <div class="form-group">
 
                     <label for="functions">
@@ -358,7 +329,6 @@
                     ></textarea>
 
                 </div>
-
 
 
                 <div class="form-actions">
@@ -381,22 +351,17 @@
 
                 </div>
 
-
             </form>
 
         </section>
 
 
 
-        <!-- =====================================
-             DAFTAR PRODUK
-        ====================================== -->
+        <!-- DAFTAR PRODUK -->
 
         <section class="panel">
 
-
             <div class="products-header">
-
 
                 <div>
 
@@ -411,76 +376,47 @@
                 </div>
 
 
-
                 <input
                     type="text"
                     id="searchProducts"
                     placeholder="Cari nama, brand, atau SKU..."
                 >
 
-
             </div>
-
 
 
             <div class="table-wrapper">
 
-
                 <table>
-
 
                     <thead>
 
                         <tr>
 
-                            <th>
-                                SKU
-                            </th>
-
-                            <th>
-                                Nama
-                            </th>
-
-                            <th>
-                                Brand
-                            </th>
-
-                            <th>
-                                Sumber
-                            </th>
-
-                            <th>
-                                AI
-                            </th>
-
-                            <th>
-                                Aksi
-                            </th>
+                            <th>SKU</th>
+                            <th>Nama</th>
+                            <th>Brand</th>
+                            <th>Sumber</th>
+                            <th>AI</th>
+                            <th>Aksi</th>
 
                         </tr>
 
                     </thead>
 
 
-
                     <tbody id="productsTable">
-
                     </tbody>
-
 
                 </table>
 
-
             </div>
-
 
         </section>
 
 
 
-        <!-- =====================================
-             MESSAGE
-        ====================================== -->
+        <!-- MESSAGE -->
 
         <div
             id="message"
@@ -492,10 +428,7 @@
 
 
 
-    <!-- =====================================
-         JAVASCRIPT
-    ====================================== -->
-
+    <!-- JavaScript berada di dalam folder Admin -->
     <script src="admin.js"></script>
 
 </body>
