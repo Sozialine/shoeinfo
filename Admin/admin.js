@@ -65,6 +65,9 @@ const productId =
 const sku =
     document.getElementById("sku");
 
+const storeEan =
+    document.getElementById("storeEan");
+
 const name =
     document.getElementById("name");
 
@@ -109,6 +112,15 @@ const message =
 
 const pagination =
     document.getElementById("pagination");
+
+const shoeTypeInput =
+    document.getElementById("shoeType");
+
+const categoryInput =
+    document.getElementById("category");
+
+const technologiesInput =
+    document.getElementById("technologies");
 
 
 /* =====================================
@@ -614,6 +626,11 @@ function renderProducts(data) {
                 </td>
 
                 <td>
+    ${escapeHtml(product.store_ean || "-")}
+</td>
+
+
+                <td>
                     ${escapeHtml(product.name || "-")}
                 </td>
 
@@ -979,6 +996,10 @@ productForm.addEventListener(
             sku:
                 sku.value.trim() ||
                 null,
+            
+             store_ean:
+        storeEan.value.trim() ||
+        null,
 
             name:
                 name.value.trim(),
@@ -991,6 +1012,15 @@ productForm.addEventListener(
                 textToArray(
                     advantages.value
                 ),
+
+                shoe_type: shoeTypeInput.value.trim() || null,
+
+category: categoryInput.value.trim() || null,
+
+technologies: technologiesInput.value
+    .split("\n")
+    .map((item) => item.trim())
+    .filter(Boolean),
 
             materials:
                 textToArray(
@@ -1120,6 +1150,9 @@ window.editProduct =
         sku.value =
             product.sku || "";
 
+        storeEan.value =
+    product.store_ean || "";
+
         name.value =
             product.name || "";
 
@@ -1143,6 +1176,16 @@ window.editProduct =
             arrayToText(
                 product.functions
             );
+
+
+            shoeTypeInput.value =
+    product.shoe_type || "";
+
+categoryInput.value =
+    product.category || "";
+
+technologiesInput.value =
+    (product.technologies || []).join("\n");
 
 
         formTitle.textContent =
@@ -1268,7 +1311,11 @@ searchProducts.addEventListener(
                             .toLowerCase()
                             .includes(query)
 
-                        ||
+                        || (product.store_ean || "")
+                    .toLowerCase()
+                    .includes(query)
+
+                ||
 
                         (product.brand || "")
                             .toLowerCase()
@@ -1296,6 +1343,12 @@ cancelButton.addEventListener(
     "click",
     resetForm
 );
+
+shoeTypeInput.value = "";
+
+categoryInput.value = "";
+
+technologiesInput.value = "";
 
 
 function resetForm() {

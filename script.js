@@ -1,3 +1,4 @@
+
 /* =====================================
    KONFIGURASI SUPABASE
 ===================================== */
@@ -11,9 +12,11 @@ const SEARCH_API_URL =
 const SUGGESTIONS_API_URL =
     `${SUPABASE_URL}/functions/v1/search-suggestions`;
 
+
 /*
    Publishable key Supabase
 */
+
 const SUPABASE_KEY =
     "sb_publishable_PQbg0iClbuSLCjurjMT_Nw_-YjIply-";
 
@@ -40,6 +43,25 @@ const emptyState =
 const productName =
     document.getElementById("productName");
 
+
+/* =====================================
+   LABEL TIPE DAN KATEGORI
+===================================== */
+
+const productLabels =
+    document.getElementById("productLabels");
+
+const shoeTypeLabel =
+    document.getElementById("shoeTypeLabel");
+
+const categoryLabel =
+    document.getElementById("categoryLabel");
+
+
+/* =====================================
+   INFORMASI PRODUK
+===================================== */
+
 const advantages =
     document.getElementById("advantages");
 
@@ -49,6 +71,12 @@ const materials =
 const functions =
     document.getElementById("functions");
 
+const technologies =
+    document.getElementById("technologies");
+
+const technologiesCard =
+    document.getElementById("technologiesCard");
+
 
 /* =====================================
    BUAT CONTAINER REKOMENDASI
@@ -57,6 +85,7 @@ const functions =
 
 let suggestionsContainer =
     document.getElementById("suggestions");
+
 
 if (!suggestionsContainer) {
 
@@ -69,13 +98,16 @@ if (!suggestionsContainer) {
     suggestionsContainer.className =
         "suggestions hidden";
 
+
     const searchSection =
         document.querySelector(".search-section");
+
 
     if (searchSection) {
 
         const searchHint =
             document.querySelector(".search-hint");
+
 
         if (searchHint) {
 
@@ -104,6 +136,225 @@ if (!suggestionsContainer) {
 let suggestionTimer = null;
 
 let currentSuggestions = [];
+
+/* =====================================
+   DETEKSI BARCODE SCANNER
+===================================== */
+
+let scannerBuffer = "";
+
+let scannerStartTime = 0;
+
+let scannerTimer = null;
+
+
+/*
+ * Scanner barcode biasanya memasukkan
+ * banyak karakter dalam waktu sangat cepat.
+ *
+ * Nilai ini menentukan batas waktu
+ * untuk membedakan scanner dengan
+ * ketikan manusia.
+ */
+
+const SCANNER_TIME_LIMIT = 150;
+
+
+/* =====================================
+   DETEKSI INPUT SCANNER
+===================================== */
+
+function handleScannerInput(event) {
+
+    /*
+     * Abaikan tombol kontrol.
+     */
+
+    if (
+        event.ctrlKey ||
+        event.altKey ||
+        event.metaKey
+    ) {
+
+        return;
+
+    }
+
+
+    /*
+     * Enter ditangani oleh event
+     * pencarian utama.
+     */
+
+    if (
+        event.key === "Enter"
+    ) {
+
+        return;
+
+    }
+
+
+    /*
+     * Hanya karakter biasa.
+     */
+
+    if (
+        event.key.length !== 1
+    ) {
+
+        return;
+
+    }
+
+
+    /*
+     * Jika karakter pertama,
+     * mulai timer scanner.
+     */
+
+    if (
+        scannerBuffer.length === 0
+    ) {
+
+        scannerStartTime =
+            performance.now();
+
+    }
+
+
+    scannerBuffer +=
+        event.key;
+
+
+    /*
+     * Reset timer setiap ada
+     * karakter baru.
+     */
+
+    clearTimeout(
+        scannerTimer
+    );
+
+
+    scannerTimer =
+        setTimeout(
+            function () {
+
+                scannerBuffer =
+                    "";
+
+                scannerStartTime =
+                    0;
+
+            },
+            300
+        );
+
+
+    /*
+     * Hitung kecepatan input.
+     */
+
+    const elapsed =
+        performance.now() -
+        scannerStartTime;
+
+
+    /*
+     * Minimal 8 karakter dan
+     * masuk sangat cepat.
+     */
+
+    if (
+        scannerBuffer.length >= 8 &&
+        elapsed <= SCANNER_TIME_LIMIT
+    ) {
+
+        console.log(
+            "Scanner barcode terdeteksi:",
+            scannerBuffer,
+            `${Math.round(elapsed)}ms`
+        );
+
+
+        /*
+         * Tunggu sebentar sampai
+         * karakter terakhir masuk
+         * ke input.
+         */
+
+        setTimeout(
+            function () {
+
+                const barcode =
+                    shoeInput.value.trim();
+
+
+                /*
+                 * Pastikan barcode berupa
+                 * EAN 8 atau EAN 13 digit.
+                 */
+
+                const isEAN =
+                    /^\d{8}$/.test(barcode) ||
+                    /^\d{13}$/.test(barcode);
+
+
+                if (
+                    isEAN
+                ) {
+
+                    clearTimeout(
+                        suggestionTimer
+                    );
+
+
+                    hideSuggestions();
+
+
+                    console.log(
+                        "Auto-search EAN:",
+                        barcode
+                    );
+
+
+                    /*
+                     * Langsung lakukan pencarian.
+                     */
+
+                    searchShoe(
+                        barcode
+                    );
+
+                }
+
+
+                /*
+                 * Reset scanner buffer.
+                 */
+
+                scannerBuffer =
+                    "";
+
+                scannerStartTime =
+                    0;
+
+            },
+            20
+        );
+
+    }
+
+}
+/* =====================================
+   EVENT DETEKSI SCANNER
+===================================== */
+
+shoeInput.addEventListener(
+    "keydown",
+    handleScannerInput
+);
 
 
 /* =====================================
@@ -333,6 +584,18 @@ async function searchShoe(customQuery = null) {
         searchButton.textContent =
             "Cari Informasi";
 
+            /*
+     * =====================================
+     * SIAP UNTUK SCAN BERIKUTNYA
+     * =====================================
+     */
+
+    shoeInput.focus();
+
+    shoeInput.select();
+
+
+
     }
 
 }
@@ -417,12 +680,103 @@ function showResult(shoe) {
         "Nama produk tidak tersedia";
 
 
+    /* =====================================
+       TAMPILKAN TIPE DAN KATEGORI
+    ===================================== */
+
+    const shoeType =
+        shoe.shoe_type
+            ? String(shoe.shoe_type).trim()
+            : "";
+
+    const category =
+        shoe.category
+            ? String(shoe.category).trim()
+            : "";
+
+
+    if (
+        productLabels &&
+        shoeTypeLabel &&
+        categoryLabel
+    ) {
+
+        if (shoeType) {
+
+            shoeTypeLabel.textContent =
+                `Tipe: ${shoeType}`;
+
+            shoeTypeLabel.classList.remove(
+                "hidden"
+            );
+
+        } else {
+
+            shoeTypeLabel.textContent =
+                "";
+
+            shoeTypeLabel.classList.add(
+                "hidden"
+            );
+
+        }
+
+
+        if (category) {
+
+            categoryLabel.textContent =
+                `Kategori: ${category}`;
+
+            categoryLabel.classList.remove(
+                "hidden"
+            );
+
+        } else {
+
+            categoryLabel.textContent =
+                "";
+
+            categoryLabel.classList.add(
+                "hidden"
+            );
+
+        }
+
+
+        if (
+            shoeType ||
+            category
+        ) {
+
+            productLabels.classList.remove(
+                "hidden"
+            );
+
+        } else {
+
+            productLabels.classList.add(
+                "hidden"
+            );
+
+        }
+
+    }
+
+
+    /* =====================================
+       KEUNGGULAN
+    ===================================== */
+
     renderList(
         advantages,
         shoe.advantages,
         "Informasi keunggulan belum tersedia."
     );
 
+
+    /* =====================================
+       BAHAN
+    ===================================== */
 
     renderList(
         materials,
@@ -431,11 +785,55 @@ function showResult(shoe) {
     );
 
 
+    /* =====================================
+       FUNGSI
+    ===================================== */
+
     renderList(
         functions,
         shoe.functions,
         "Informasi fungsi belum tersedia."
     );
+
+
+    /* =====================================
+       TEKNOLOGI
+    ===================================== */
+
+    if (
+        technologies &&
+        technologiesCard
+    ) {
+
+        if (
+            Array.isArray(
+                shoe.technologies
+            ) &&
+            shoe.technologies.length > 0
+        ) {
+
+            renderList(
+                technologies,
+                shoe.technologies,
+                ""
+            );
+
+            technologiesCard.classList.remove(
+                "hidden"
+            );
+
+        } else {
+
+            technologies.innerHTML =
+                "";
+
+            technologiesCard.classList.add(
+                "hidden"
+            );
+
+        }
+
+    }
 
 
     resultSection.classList.remove(
@@ -455,6 +853,13 @@ function renderList(
     emptyMessage
 ) {
 
+    if (!container) {
+
+        return;
+
+    }
+
+
     container.innerHTML =
         "";
 
@@ -464,10 +869,14 @@ function renderList(
         items.length === 0
     ) {
 
-        addListItem(
-            container,
-            emptyMessage
-        );
+        if (emptyMessage) {
+
+            addListItem(
+                container,
+                emptyMessage
+            );
+
+        }
 
         return;
 
@@ -505,6 +914,13 @@ function addListItem(
     text
 ) {
 
+    if (!container) {
+
+        return;
+
+    }
+
+
     const li =
         document.createElement("li");
 
@@ -519,10 +935,73 @@ function addListItem(
 
 
 /* =====================================
+   SEMBUNYIKAN INFO TAMBAHAN
+===================================== */
+
+function hideAdditionalProductInfo() {
+
+    if (
+        productLabels
+    ) {
+
+        productLabels.classList.add(
+            "hidden"
+        );
+
+    }
+
+
+    if (
+        shoeTypeLabel
+    ) {
+
+        shoeTypeLabel.textContent =
+            "";
+
+    }
+
+
+    if (
+        categoryLabel
+    ) {
+
+        categoryLabel.textContent =
+            "";
+
+    }
+
+
+    if (
+        technologies
+    ) {
+
+        technologies.innerHTML =
+            "";
+
+    }
+
+
+    if (
+        technologiesCard
+    ) {
+
+        technologiesCard.classList.add(
+            "hidden"
+        );
+
+    }
+
+}
+
+
+/* =====================================
    PRODUK TIDAK DITEMUKAN
 ===================================== */
 
 function showNotFound(query) {
+
+    hideAdditionalProductInfo();
+
 
     productName.textContent =
         "Informasi tidak ditemukan";
@@ -568,6 +1047,9 @@ function showNotFound(query) {
 ===================================== */
 
 function showError(message) {
+
+    hideAdditionalProductInfo();
+
 
     productName.textContent =
         "Terjadi kesalahan koneksi";
@@ -922,20 +1404,41 @@ shoeInput.addEventListener(
     function (event) {
 
         if (
-            event.key === "Enter"
+            event.key !== "Enter"
         ) {
-
-            event.preventDefault();
-
-            clearTimeout(
-                suggestionTimer
-            );
-
-            hideSuggestions();
-
-            searchShoe();
-
+            return;
         }
+
+
+        event.preventDefault();
+
+
+        clearTimeout(
+            suggestionTimer
+        );
+
+
+        hideSuggestions();
+
+
+        const query =
+            shoeInput.value.trim();
+
+
+        if (!query) {
+            return;
+        }
+
+
+        console.log(
+            "Search dengan Enter:",
+            query
+        );
+
+
+        searchShoe(
+            query
+        );
 
     }
 );
@@ -954,6 +1457,31 @@ shoeInput.addEventListener(
         ) {
 
             hideSuggestions();
+
+        }
+
+    }
+);
+
+/* =====================================
+   SIAP MENERIMA SCAN BERIKUTNYA
+===================================== */
+
+shoeInput.addEventListener(
+    "focus",
+    function () {
+
+        /*
+         * Jika input berisi EAN sebelumnya,
+         * pilih seluruh teks agar hasil scan
+         * berikutnya langsung menggantikannya.
+         */
+
+        if (
+            shoeInput.value.trim()
+        ) {
+
+            shoeInput.select();
 
         }
 

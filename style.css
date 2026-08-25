@@ -534,3 +534,56 @@ body {
 .suggestion-item:active {
     transform: scale(0.99);
 }
+
+/* =====================================
+   BADGE TIPE DAN KATEGORI
+===================================== */
+
+.product-labels {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 14px;
+}
+
+.product-badge {
+    display: inline-flex;
+    align-items: center;
+
+    padding: 8px 14px;
+
+    border-radius: 999px;
+
+    background: rgba(37, 99, 235, 0.1);
+
+    border: 1px solid rgba(37, 99, 235, 0.25);
+
+    color: #2563eb;
+
+    font-size: 13px;
+    font-weight: 600;
+
+    line-height: 1;
+}
+
+/* Sembunyikan badge yang tidak memiliki data */
+
+.product-badge.hidden {
+    display: none;
+}
+
+
+/* RESPONSIVE */
+
+@media (max-width: 480px) {
+
+    .product-labels {
+        gap: 8px;
+    }
+
+    .product-badge {
+        padding: 7px 12px;
+        font-size: 12px;
+    }
+
+}
