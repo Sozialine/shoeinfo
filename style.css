@@ -182,13 +182,13 @@ body {
         var(--white);
 
     font-size:
-        1.15rem;
+        2.15rem;
 
     font-weight:
         800;
 
     letter-spacing:
-        -0.045em;
+        -0.055em;
 
 }
 
@@ -440,7 +440,7 @@ body {
         var(--navy);
 
     font-size:
-        clamp(2rem, 5vw, 3.35rem);
+        clamp(1.7rem, 4vw, 2.7rem);
 
     line-height:
         1.08;
@@ -449,7 +449,7 @@ body {
         800;
 
     letter-spacing:
-        -0.055em;
+        -0.045em;
 
 }
 
