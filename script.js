@@ -1,89 +1,142 @@
-/* =====================================
+/* =========================================================
+   SNEAKERS INDEX
+   SCRIPT.JS - FINAL VERSION
+========================================================= */
+
+
+/* =========================================================
    KONFIGURASI SUPABASE
-===================================== */
+========================================================= */
 
 const SUPABASE_URL =
     "https://kqwfxglzelhdjsxeceld.supabase.co";
 
+
 const SEARCH_API_URL =
     `${SUPABASE_URL}/functions/v1/search-shoe`;
+
 
 const SUGGESTIONS_API_URL =
     `${SUPABASE_URL}/functions/v1/search-suggestions`;
 
 
-/* =====================================
+/* =========================================================
    PUBLISHABLE KEY SUPABASE
-===================================== */
+========================================================= */
 
 const SUPABASE_KEY =
     "sb_publishable_PQbg0iClbuSLCjurjMT_Nw_-YjIply-";
 
 
-/* =====================================
+/* =========================================================
    ELEMENT UTAMA
-===================================== */
+========================================================= */
 
 const shoeInput =
     document.getElementById("shoeInput");
 
+
 const searchButton =
     document.getElementById("searchButton");
+
 
 const loading =
     document.getElementById("loading");
 
+
 const resultSection =
     document.getElementById("resultSection");
+
 
 const emptyState =
     document.getElementById("emptyState");
 
+
 const productName =
     document.getElementById("productName");
+
 
 const productColorway =
     document.getElementById("productColorway");
 
-/* =====================================
+
+/* =========================================================
    LABEL PRODUK
-   TIPE + KATEGORI
-===================================== */
+========================================================= */
 
 const productLabels =
     document.getElementById("productLabels");
 
+
 const shoeTypeLabel =
     document.getElementById("shoeTypeLabel");
+
 
 const categoryLabel =
     document.getElementById("categoryLabel");
 
 
-/* =====================================
+/* =========================================================
    INFORMASI PRODUK
-===================================== */
+========================================================= */
 
 const advantages =
     document.getElementById("advantages");
 
+
 const materials =
     document.getElementById("materials");
+
 
 const functions =
     document.getElementById("functions");
 
+
 const technologies =
     document.getElementById("technologies");
 
+
 const technologiesCard =
-    document.getElementById("technologiesCard");
+    document.getElementById("technologiesAccordion");
 
 
-/* =====================================
+/* =========================================================
+   ACCORDION CARD
+========================================================= */
+
+const advantagesCard =
+    document.getElementById("advantagesCard");
+
+
+const materialsCard =
+    document.getElementById("materialsCard");
+
+
+const functionsCard =
+    document.getElementById("functionsCard");
+
+
+/* =========================================================
+   SIDEBAR
+========================================================= */
+
+const infoSidebar =
+    document.querySelector(".information-sidebar");
+
+
+/* =========================================================
+   MENU TEKNOLOGI
+========================================================= */
+
+const technologyNavButton =
+    document.getElementById(
+        "technologyNav"
+    );
+
+
+/* =========================================================
    BUAT CONTAINER REKOMENDASI
-   OTOMATIS JIKA BELUM ADA
-===================================== */
+========================================================= */
 
 let suggestionsContainer =
     document.getElementById("suggestions");
@@ -94,21 +147,27 @@ if (!suggestionsContainer) {
     suggestionsContainer =
         document.createElement("div");
 
+
     suggestionsContainer.id =
         "suggestions";
+
 
     suggestionsContainer.className =
         "suggestions hidden";
 
 
     const searchSection =
-        document.querySelector(".search-section");
+        document.querySelector(
+            ".search-section"
+        );
 
 
     if (searchSection) {
 
         const searchHint =
-            document.querySelector(".search-hint");
+            document.querySelector(
+                ".search-hint"
+            );
 
 
         if (searchHint) {
@@ -131,76 +190,53 @@ if (!suggestionsContainer) {
 }
 
 
-/* =====================================
+/* =========================================================
    STATUS REKOMENDASI
-===================================== */
+========================================================= */
 
 let suggestionTimer =
     null;
 
+
 let suggestionAbortController =
     null;
+
 
 let currentSuggestions =
     [];
 
 
-/* =====================================
+/* =========================================================
    STATUS BARCODE SCANNER
-===================================== */
+========================================================= */
 
 let scannerBuffer =
     "";
 
+
 let scannerStartTime =
     0;
 
+
 let scannerTimer =
     null;
+
 
 let scannerSearchTimer =
     null;
 
 
-/*
-   Scanner barcode biasanya memasukkan
-   karakter sangat cepat.
-
-   Jangan terlalu ketat karena beberapa
-   scanner atau komputer bisa sedikit
-   lebih lambat.
-*/
-
 const SCANNER_TIME_LIMIT =
     250;
 
-
-/*
-   Waktu tunggu setelah karakter terakhir.
-
-   Ini penting agar EAN-13 tidak langsung
-   dicari ketika baru mencapai 8 digit.
-*/
 
 const SCANNER_FINISH_DELAY =
     150;
 
 
-/* =====================================
-   CEK ELEMENT
-===================================== */
-
-function hasElement(element) {
-
-    return element !== null &&
-        element !== undefined;
-
-}
-
-
-/* =====================================
+/* =========================================================
    HELPER RESPONSE JSON
-===================================== */
+========================================================= */
 
 async function getResponseData(response) {
 
@@ -222,9 +258,9 @@ async function getResponseData(response) {
 }
 
 
-/* =====================================
+/* =========================================================
    REQUEST HEADER
-===================================== */
+========================================================= */
 
 function getHeaders() {
 
@@ -241,9 +277,9 @@ function getHeaders() {
 }
 
 
-/* =====================================
+/* =========================================================
    CEK BARCODE / EAN
-===================================== */
+========================================================= */
 
 function isBarcodeQuery(query) {
 
@@ -260,9 +296,9 @@ function isBarcodeQuery(query) {
 }
 
 
-/* =====================================
-   BERSIHKAN ARRAY DATA
-===================================== */
+/* =========================================================
+   BERSIHKAN ARRAY
+========================================================= */
 
 function cleanArray(items) {
 
@@ -288,9 +324,9 @@ function cleanArray(items) {
 }
 
 
-/* =====================================
-   HAPUS DUPLIKAT ARRAY
-===================================== */
+/* =========================================================
+   HAPUS DUPLIKAT
+========================================================= */
 
 function uniqueArray(items) {
 
@@ -321,6 +357,7 @@ function uniqueArray(items) {
                 normalized
             );
 
+
             return true;
 
         }
@@ -329,15 +366,11 @@ function uniqueArray(items) {
 }
 
 
-/* =====================================
+/* =========================================================
    DETEKSI BARCODE SCANNER
-===================================== */
+========================================================= */
 
 function handleScannerInput(event) {
-
-    /*
-       Jangan proses shortcut keyboard.
-    */
 
     if (
         event.ctrlKey ||
@@ -350,11 +383,6 @@ function handleScannerInput(event) {
     }
 
 
-    /*
-       Enter akan ditangani oleh event
-       Enter utama.
-    */
-
     if (
         event.key === "Enter"
     ) {
@@ -363,10 +391,6 @@ function handleScannerInput(event) {
 
     }
 
-
-    /*
-       Hanya karakter biasa.
-    */
 
     if (
         event.key.length !== 1
@@ -377,11 +401,6 @@ function handleScannerInput(event) {
     }
 
 
-    /*
-       Scanner barcode EAN pada umumnya
-       menghasilkan angka.
-    */
-
     if (
         !/^\d$/.test(event.key)
     ) {
@@ -389,25 +408,25 @@ function handleScannerInput(event) {
         scannerBuffer =
             "";
 
+
         scannerStartTime =
             0;
+
 
         clearTimeout(
             scannerTimer
         );
 
+
         clearTimeout(
             scannerSearchTimer
         );
+
 
         return;
 
     }
 
-
-    /*
-       Karakter pertama.
-    */
 
     if (
         scannerBuffer.length === 0
@@ -419,17 +438,9 @@ function handleScannerInput(event) {
     }
 
 
-    /*
-       Tambahkan karakter.
-    */
-
     scannerBuffer +=
         event.key;
 
-
-    /*
-       Reset timer.
-    */
 
     clearTimeout(
         scannerTimer
@@ -448,6 +459,7 @@ function handleScannerInput(event) {
                 scannerBuffer =
                     "";
 
+
                 scannerStartTime =
                     0;
 
@@ -456,92 +468,50 @@ function handleScannerInput(event) {
         );
 
 
-    /*
-       Hitung kecepatan input.
-    */
-
     const elapsed =
         performance.now() -
         scannerStartTime;
 
-
-    /*
-       Minimal 8 digit dan masuk cepat.
-    */
 
     if (
         scannerBuffer.length >= 8 &&
         elapsed <= SCANNER_TIME_LIMIT
     ) {
 
-        /*
-           Tunggu sebentar sampai scanner
-           selesai memasukkan semua digit.
-
-           Dengan cara ini EAN-13 tidak akan
-           dicari saat baru 8 digit.
-        */
-
         scannerSearchTimer =
             setTimeout(
                 function () {
 
                     const barcode =
-                        shoeInput.value
-                            .trim();
+                        shoeInput
+                            ? shoeInput.value.trim()
+                            : "";
 
-
-                    const elapsedFinal =
-                        performance.now() -
-                        scannerStartTime;
-
-
-                    /*
-                       Pastikan masih scanner
-                       dan barcode valid.
-                    */
 
                     if (
-                        elapsedFinal <=
-                        SCANNER_TIME_LIMIT + 1000
+                        isBarcodeQuery(
+                            barcode
+                        )
                     ) {
 
-                        if (
-                            isBarcodeQuery(
-                                barcode
-                            )
-                        ) {
-
-                            console.log(
-                                "Scanner barcode terdeteksi:",
-                                barcode,
-                                `${Math.round(elapsedFinal)}ms`
-                            );
+                        clearTimeout(
+                            suggestionTimer
+                        );
 
 
-                            clearTimeout(
-                                suggestionTimer
-                            );
+                        hideSuggestions();
 
 
-                            hideSuggestions();
-
-
-                            searchShoe(
-                                barcode
-                            );
-
-                        }
+                        searchShoe(
+                            barcode
+                        );
 
                     }
 
 
-                    /*
-                       Reset scanner.
-                    */
-
                     scannerBuffer =
                         "";
+
 
                     scannerStartTime =
                         0;
@@ -555,10 +525,6 @@ function handleScannerInput(event) {
 }
 
 
-/* =====================================
-   EVENT DETEKSI SCANNER
-===================================== */
-
 if (shoeInput) {
 
     shoeInput.addEventListener(
@@ -569,17 +535,15 @@ if (shoeInput) {
 }
 
 
-/* =====================================
+/* =========================================================
    SEARCH SEPATU
-===================================== */
+========================================================= */
 
 async function searchShoe(
     customQuery = null
 ) {
 
-    if (
-        !shoeInput
-    ) {
+    if (!shoeInput) {
 
         console.error(
             "Element #shoeInput tidak ditemukan."
@@ -597,45 +561,32 @@ async function searchShoe(
         ).trim();
 
 
-    /* =====================================
-       VALIDASI
-    ===================================== */
-
     if (!query) {
 
         alert(
             "Silakan masukkan nama sepatu, SKU, atau barcode."
         );
 
+
         shoeInput.focus();
+
 
         return;
 
     }
 
 
-    /* =====================================
-       MASUKKAN QUERY KE INPUT
-    ===================================== */
-
     shoeInput.value =
         query;
 
-
-    /* =====================================
-       SEMBUNYIKAN REKOMENDASI
-    ===================================== */
 
     clearTimeout(
         suggestionTimer
     );
 
+
     hideSuggestions();
 
-
-    /* =====================================
-       SEMBUNYIKAN HASIL SEBELUMNYA
-    ===================================== */
 
     if (emptyState) {
 
@@ -658,10 +609,6 @@ async function searchShoe(
     hideAdditionalProductInfo();
 
 
-    /* =====================================
-       TAMPILKAN LOADING
-    ===================================== */
-
     if (loading) {
 
         loading.classList.remove(
@@ -671,14 +618,11 @@ async function searchShoe(
     }
 
 
-    /* =====================================
-       NONAKTIFKAN TOMBOL
-    ===================================== */
-
     if (searchButton) {
 
         searchButton.disabled =
             true;
+
 
         searchButton.textContent =
             "Mencari...";
@@ -687,16 +631,6 @@ async function searchShoe(
 
 
     try {
-
-        console.log(
-            "Searching:",
-            query
-        );
-
-
-        /* =====================================
-           REQUEST KE SEARCH-SHOE
-        ===================================== */
 
         const response =
             await fetch(
@@ -725,43 +659,17 @@ async function searchShoe(
             );
 
 
-        console.log(
-            "Search status:",
-            response.status
-        );
+        if (!response.ok) {
 
-
-        console.log(
-            "Search response:",
-            data
-        );
-
-
-        /* =====================================
-           ERROR HTTP
-        ===================================== */
-
-        if (
-            !response.ok
-        ) {
-
-            const errorMessage =
+            throw new Error(
                 getErrorMessage(
                     data,
                     response.status
-                );
-
-
-            throw new Error(
-                errorMessage
+                )
             );
 
         }
 
-
-        /* =====================================
-           ERROR DARI BACKEND
-        ===================================== */
 
         if (
             data.success === false
@@ -777,10 +685,6 @@ async function searchShoe(
         }
 
 
-        /* =====================================
-           PRODUK DITEMUKAN
-        ===================================== */
-
         if (
             data.success === true &&
             data.found === true &&
@@ -791,20 +695,16 @@ async function searchShoe(
                 data.product
             );
 
+
             return;
 
         }
 
 
-        /* =====================================
-           PRODUK TIDAK DITEMUKAN
-        ===================================== */
-
         showNotFound(
             query,
             data.message
         );
-
 
     } catch (error) {
 
@@ -821,10 +721,6 @@ async function searchShoe(
 
     } finally {
 
-        /* =====================================
-           SEMBUNYIKAN LOADING
-        ===================================== */
-
         if (loading) {
 
             loading.classList.add(
@@ -834,14 +730,11 @@ async function searchShoe(
         }
 
 
-        /* =====================================
-           AKTIFKAN TOMBOL
-        ===================================== */
-
         if (searchButton) {
 
             searchButton.disabled =
                 false;
+
 
             searchButton.textContent =
                 "Cari Informasi";
@@ -849,15 +742,9 @@ async function searchShoe(
         }
 
 
-        /* =====================================
-           SIAP UNTUK SCAN BERIKUTNYA
-        ===================================== */
-
         if (shoeInput) {
 
             shoeInput.focus();
-
-            shoeInput.select();
 
         }
 
@@ -866,9 +753,9 @@ async function searchShoe(
 }
 
 
-/* =====================================
-   PESAN ERROR LEBIH JELAS
-===================================== */
+/* =========================================================
+   PESAN ERROR
+========================================================= */
 
 function getErrorMessage(
     data,
@@ -881,10 +768,6 @@ function getErrorMessage(
         "";
 
 
-    /* =====================================
-       QUOTA / RATE LIMIT
-    ===================================== */
-
     if (
         status === 429 ||
         /quota|rate limit|too many requests|resource exhausted/i.test(
@@ -893,55 +776,25 @@ function getErrorMessage(
     ) {
 
         return (
-            "Batas penggunaan layanan AI sedang tercapai. " +
+            "Batas penggunaan layanan sedang tercapai. " +
             "Silakan tunggu beberapa saat lalu coba lagi."
         );
 
     }
 
 
-    /* =====================================
-       GEMINI
-    ===================================== */
-
     if (
-        /gemini/i.test(
-            rawMessage
-        ) &&
-        /quota|limit|exceeded/i.test(
+        /api key|unauthorized|forbidden/i.test(
             rawMessage
         )
     ) {
 
         return (
-            "Batas penggunaan Gemini sedang tercapai. " +
-            "Silakan coba kembali beberapa saat lagi."
+            "Konfigurasi API backend bermasalah."
         );
 
     }
 
-
-    /* =====================================
-       API KEY
-    ===================================== */
-
-    if (
-        /api key|gemini_api_key|deepseek_api_key|unauthorized|forbidden/i.test(
-            rawMessage
-        )
-    ) {
-
-        return (
-            "Konfigurasi API backend bermasalah. " +
-            "Silakan periksa Environment Variables di Supabase."
-        );
-
-    }
-
-
-    /* =====================================
-       SERVER
-    ===================================== */
 
     if (
         status >= 500
@@ -949,7 +802,7 @@ function getErrorMessage(
 
         return (
             rawMessage ||
-            "Terjadi kesalahan pada server. Silakan coba lagi."
+            "Terjadi kesalahan pada server."
         );
 
     }
@@ -963,9 +816,9 @@ function getErrorMessage(
 }
 
 
-/* =====================================
+/* =========================================================
    TAMPILKAN HASIL PRODUK
-===================================== */
+========================================================= */
 
 function showResult(shoe) {
 
@@ -988,41 +841,44 @@ function showResult(shoe) {
 
     }
 
+
     /* =====================================
-   COLORWAY PRODUK
-===================================== */
+       COLORWAY
+    ===================================== */
 
-const colorway =
-    shoe.colorway
-        ? String(
-            shoe.colorway
-        ).trim()
-        : "";
+    const colorway =
+        shoe.colorway
+            ? String(
+                shoe.colorway
+            ).trim()
+            : "";
 
 
-if (productColorway) {
+    if (productColorway) {
 
-    productColorway.textContent =
-        colorway;
+        productColorway.textContent =
+            colorway;
 
-    if (colorway) {
 
-        productColorway.classList.remove(
-            "hidden"
-        );
+        if (colorway) {
 
-    } else {
+            productColorway.classList.remove(
+                "hidden"
+            );
 
-        productColorway.classList.add(
-            "hidden"
-        );
+        } else {
+
+            productColorway.classList.add(
+                "hidden"
+            );
+
+        }
 
     }
 
-}
 
     /* =====================================
-       TIPE PRODUK
+       TIPE DAN KATEGORI
     ===================================== */
 
     const shoeType =
@@ -1033,10 +889,6 @@ if (productColorway) {
             : "";
 
 
-    /* =====================================
-       KATEGORI PRODUK
-    ===================================== */
-
     const category =
         shoe.category
             ? String(
@@ -1044,10 +896,6 @@ if (productColorway) {
             ).trim()
             : "";
 
-
-    /* =====================================
-       TAMPILKAN LABEL
-    ===================================== */
 
     showProductLabels(
         shoeType,
@@ -1067,13 +915,13 @@ if (productColorway) {
 
 
     /* =====================================
-       BAHAN
+       MATERIAL
     ===================================== */
 
     renderList(
         materials,
         shoe.materials,
-        "Informasi bahan belum tersedia."
+        "Informasi material belum tersedia."
     );
 
 
@@ -1090,14 +938,6 @@ if (productColorway) {
 
     /* =====================================
        TEKNOLOGI
-
-       Backend harus mengirim:
-
-       technologies: [
-           "Nike Air",
-           "Zoom Air",
-           "React"
-       ]
     ===================================== */
 
     const technologyItems =
@@ -1126,6 +966,22 @@ if (productColorway) {
                 "hidden"
             );
 
+
+            /*
+               Tampilkan menu sidebar
+               Teknologi.
+            */
+
+            if (
+                technologyNavButton
+            ) {
+
+                technologyNavButton.classList.remove(
+                    "hidden"
+                );
+
+            }
+
         } else {
 
             technologies.innerHTML =
@@ -1135,6 +991,26 @@ if (productColorway) {
             technologiesCard.classList.add(
                 "hidden"
             );
+
+
+            /*
+               Sembunyikan menu sidebar
+               Teknologi.
+            */
+
+            if (
+                technologyNavButton
+            ) {
+
+                technologyNavButton.classList.add(
+                    "hidden"
+                );
+
+                technologyNavButton.classList.remove(
+                    "active"
+                );
+
+            }
 
         }
 
@@ -1153,12 +1029,19 @@ if (productColorway) {
 
     }
 
+
+    /* =====================================
+       RESET ACCORDION
+    ===================================== */
+
+    resetAccordion();
+
 }
 
 
-/* =====================================
+/* =========================================================
    TAMPILKAN LABEL PRODUK
-===================================== */
+========================================================= */
 
 function showProductLabels(
     shoeType,
@@ -1171,21 +1054,14 @@ function showProductLabels(
         !categoryLabel
     ) {
 
-        console.warn(
-            "Element label produk belum ditemukan."
-        );
-
         return;
 
     }
 
 
-    /* =====================================
-       RESET
-    ===================================== */
-
     shoeTypeLabel.textContent =
         "";
+
 
     categoryLabel.textContent =
         "";
@@ -1195,18 +1071,13 @@ function showProductLabels(
         "hidden"
     );
 
+
     categoryLabel.classList.add(
         "hidden"
     );
 
 
-    /* =====================================
-       TIPE
-    ===================================== */
-
-    if (
-        shoeType
-    ) {
+    if (shoeType) {
 
         shoeTypeLabel.textContent =
             shoeType;
@@ -1219,13 +1090,7 @@ function showProductLabels(
     }
 
 
-    /* =====================================
-       KATEGORI
-    ===================================== */
-
-    if (
-        category
-    ) {
+    if (category) {
 
         categoryLabel.textContent =
             category;
@@ -1237,10 +1102,6 @@ function showProductLabels(
 
     }
 
-
-    /* =====================================
-       CONTAINER LABEL
-    ===================================== */
 
     if (
         shoeType ||
@@ -1262,9 +1123,9 @@ function showProductLabels(
 }
 
 
-/* =====================================
+/* =========================================================
    RENDER LIST
-===================================== */
+========================================================= */
 
 function renderList(
     container,
@@ -1272,9 +1133,7 @@ function renderList(
     emptyMessage = ""
 ) {
 
-    if (
-        !container
-    ) {
+    if (!container) {
 
         return;
 
@@ -1291,17 +1150,11 @@ function renderList(
         );
 
 
-    /* =====================================
-       DATA KOSONG
-    ===================================== */
-
     if (
         cleanItems.length === 0
     ) {
 
-        if (
-            emptyMessage
-        ) {
+        if (emptyMessage) {
 
             addListItem(
                 container,
@@ -1310,18 +1163,11 @@ function renderList(
 
         }
 
+
         return;
 
     }
 
-
-    /* =====================================
-       TAMBAHKAN SEMUA ITEM
-
-       Tidak dibatasi 2 item.
-       Semua data dari backend akan
-       ditampilkan selama backend mengirimnya.
-    ===================================== */
 
     cleanItems.forEach(
         item => {
@@ -1337,18 +1183,16 @@ function renderList(
 }
 
 
-/* =====================================
+/* =========================================================
    TAMBAH LIST ITEM
-===================================== */
+========================================================= */
 
 function addListItem(
     container,
     text
 ) {
 
-    if (
-        !container
-    ) {
+    if (!container) {
 
         return;
 
@@ -1361,9 +1205,7 @@ function addListItem(
         ).trim();
 
 
-    if (
-        !cleanText
-    ) {
+    if (!cleanText) {
 
         return;
 
@@ -1387,54 +1229,39 @@ function addListItem(
 }
 
 
-/* =====================================
-   SEMBUNYIKAN INFO TAMBAHAN
-===================================== */
+/* =========================================================
+   SEMBUNYIKAN INFORMASI TAMBAHAN
+========================================================= */
 
 function hideAdditionalProductInfo() {
 
-    /* =====================================
-       LABEL CONTAINER
-    ===================================== */
+    if (productColorway) {
 
-    if (
-        productLabels
-    ) {
+        productColorway.textContent =
+            "";
+
+
+        productColorway.classList.add(
+            "hidden"
+        );
+
+    }
+
+
+    if (productLabels) {
 
         productLabels.classList.add(
             "hidden"
         );
 
-        /* =====================================
-   COLORWAY
-===================================== */
-
-if (
-    productColorway
-) {
-
-    productColorway.textContent =
-        "";
-
-    productColorway.classList.add(
-        "hidden"
-    );
-
-}
-
     }
 
 
-    /* =====================================
-       LABEL TIPE
-    ===================================== */
-
-    if (
-        shoeTypeLabel
-    ) {
+    if (shoeTypeLabel) {
 
         shoeTypeLabel.textContent =
             "";
+
 
         shoeTypeLabel.classList.add(
             "hidden"
@@ -1443,16 +1270,11 @@ if (
     }
 
 
-    /* =====================================
-       LABEL KATEGORI
-    ===================================== */
-
-    if (
-        categoryLabel
-    ) {
+    if (categoryLabel) {
 
         categoryLabel.textContent =
             "";
+
 
         categoryLabel.classList.add(
             "hidden"
@@ -1461,13 +1283,7 @@ if (
     }
 
 
-    /* =====================================
-       TEKNOLOGI
-    ===================================== */
-
-    if (
-        technologies
-    ) {
+    if (technologies) {
 
         technologies.innerHTML =
             "";
@@ -1475,9 +1291,7 @@ if (
     }
 
 
-    if (
-        technologiesCard
-    ) {
+    if (technologiesCard) {
 
         technologiesCard.classList.add(
             "hidden"
@@ -1485,12 +1299,26 @@ if (
 
     }
 
+
+    if (technologyNavButton) {
+
+        technologyNavButton.classList.add(
+            "hidden"
+        );
+
+
+        technologyNavButton.classList.remove(
+            "active"
+        );
+
+    }
+
 }
 
 
-/* =====================================
+/* =========================================================
    PRODUK TIDAK DITEMUKAN
-===================================== */
+========================================================= */
 
 function showNotFound(
     query,
@@ -1547,13 +1375,11 @@ function showNotFound(
 
     addListItem(
         functions,
-        "Anda juga dapat mencoba SKU, artikel produk, atau barcode toko."
+        "Anda juga dapat mencoba SKU, artikel produk, atau barcode."
     );
 
 
-    if (
-        resultSection
-    ) {
+    if (resultSection) {
 
         resultSection.classList.remove(
             "hidden"
@@ -1561,23 +1387,22 @@ function showNotFound(
 
     }
 
+
+    resetAccordion();
+
 }
 
 
-/* =====================================
+/* =========================================================
    TAMPILKAN ERROR
-===================================== */
+========================================================= */
 
-function showError(
-    message
-) {
+function showError(message) {
 
     hideAdditionalProductInfo();
 
 
-    if (
-        productName
-    ) {
+    if (productName) {
 
         productName.textContent =
             "Terjadi kesalahan koneksi";
@@ -1585,9 +1410,7 @@ function showError(
     }
 
 
-    if (
-        advantages
-    ) {
+    if (advantages) {
 
         advantages.innerHTML =
             "";
@@ -1595,9 +1418,7 @@ function showError(
     }
 
 
-    if (
-        materials
-    ) {
+    if (materials) {
 
         materials.innerHTML =
             "";
@@ -1605,9 +1426,7 @@ function showError(
     }
 
 
-    if (
-        functions
-    ) {
+    if (functions) {
 
         functions.innerHTML =
             "";
@@ -1634,9 +1453,7 @@ function showError(
     );
 
 
-    if (
-        resultSection
-    ) {
+    if (resultSection) {
 
         resultSection.classList.remove(
             "hidden"
@@ -1644,20 +1461,19 @@ function showError(
 
     }
 
+
+    resetAccordion();
+
 }
 
 
-/* =====================================
+/* =========================================================
    AMBIL REKOMENDASI
-===================================== */
+========================================================= */
 
-async function getSuggestions(
-    query
-) {
+async function getSuggestions(query) {
 
-    if (
-        !shoeInput
-    ) {
+    if (!shoeInput) {
 
         return;
 
@@ -1669,10 +1485,6 @@ async function getSuggestions(
             query || ""
         ).trim();
 
-
-    /* =====================================
-       JANGAN REKOMENDASI UNTUK BARCODE
-    ===================================== */
 
     if (
         isBarcodeQuery(
@@ -1687,10 +1499,6 @@ async function getSuggestions(
     }
 
 
-    /* =====================================
-       QUERY TERLALU PENDEK
-    ===================================== */
-
     if (
         cleanQuery.length < 3
     ) {
@@ -1701,10 +1509,6 @@ async function getSuggestions(
 
     }
 
-
-    /* =====================================
-       BATALKAN REQUEST SEBELUMNYA
-    ===================================== */
 
     if (
         suggestionAbortController
@@ -1751,26 +1555,6 @@ async function getSuggestions(
             );
 
 
-        console.log(
-            "Suggestions status:",
-            response.status
-        );
-
-
-        console.log(
-            "Suggestions response:",
-            data
-        );
-
-
-        /* =====================================
-           JIKA GAGAL, JANGAN TAMPILKAN ERROR
-           DI LAYAR UTAMA
-
-           Rekomendasi hanyalah fitur tambahan.
-           Pencarian utama tetap bisa digunakan.
-        ===================================== */
-
         if (
             !response.ok
         ) {
@@ -1796,10 +1580,6 @@ async function getSuggestions(
         }
 
 
-        /* =====================================
-           PASTIKAN INPUT BELUM BERUBAH
-        ===================================== */
-
         if (
             shoeInput.value.trim() !==
             cleanQuery
@@ -1809,10 +1589,6 @@ async function getSuggestions(
 
         }
 
-
-        /* =====================================
-           HILANGKAN DUPLIKAT
-        ===================================== */
 
         const uniqueSuggestions =
             uniqueArray(
@@ -1828,13 +1604,7 @@ async function getSuggestions(
             uniqueSuggestions
         );
 
-
     } catch (error) {
-
-        /*
-           Abort adalah normal ketika user
-           mengetik karakter baru.
-        */
 
         if (
             error?.name ===
@@ -1864,13 +1634,11 @@ async function getSuggestions(
 }
 
 
-/* =====================================
+/* =========================================================
    TAMPILKAN REKOMENDASI
-===================================== */
+========================================================= */
 
-function showSuggestions(
-    items
-) {
+function showSuggestions(items) {
 
     if (
         !suggestionsContainer
@@ -1902,10 +1670,6 @@ function showSuggestions(
     }
 
 
-    /* =====================================
-       JUDUL
-    ===================================== */
-
     const title =
         document.createElement(
             "p"
@@ -1924,10 +1688,6 @@ function showSuggestions(
         title
     );
 
-
-    /* =====================================
-       LIST
-    ===================================== */
 
     const list =
         document.createElement(
@@ -1964,9 +1724,7 @@ function showSuggestions(
                 "click",
                 function () {
 
-                    if (
-                        shoeInput
-                    ) {
+                    if (shoeInput) {
 
                         shoeInput.value =
                             item;
@@ -2010,9 +1768,9 @@ function showSuggestions(
 }
 
 
-/* =====================================
+/* =========================================================
    SEMBUNYIKAN REKOMENDASI
-===================================== */
+========================================================= */
 
 function hideSuggestions() {
 
@@ -2040,13 +1798,11 @@ function hideSuggestions() {
 }
 
 
-/* =====================================
-   EVENT INPUT + DEBOUNCE
-===================================== */
+/* =========================================================
+   INPUT + DEBOUNCE
+========================================================= */
 
-if (
-    shoeInput
-) {
+if (shoeInput) {
 
     shoeInput.addEventListener(
         "input",
@@ -2061,11 +1817,6 @@ if (
                 shoeInput.value.trim();
 
 
-            /* =====================================
-               JANGAN MINTA REKOMENDASI
-               UNTUK BARCODE
-            ===================================== */
-
             if (
                 isBarcodeQuery(
                     query
@@ -2079,10 +1830,6 @@ if (
             }
 
 
-            /* =====================================
-               QUERY TERLALU PENDEK
-            ===================================== */
-
             if (
                 query.length < 3
             ) {
@@ -2093,10 +1840,6 @@ if (
 
             }
 
-
-            /* =====================================
-               DEBOUNCE
-            ===================================== */
 
             suggestionTimer =
                 setTimeout(
@@ -2116,13 +1859,11 @@ if (
 }
 
 
-/* =====================================
-   EVENT TOMBOL CARI
-===================================== */
+/* =========================================================
+   TOMBOL CARI
+========================================================= */
 
-if (
-    searchButton
-) {
+if (searchButton) {
 
     searchButton.addEventListener(
         "click",
@@ -2136,23 +1877,18 @@ if (
 }
 
 
-/* =====================================
+/* =========================================================
    ENTER UNTUK SEARCH
-===================================== */
+========================================================= */
 
-if (
-    shoeInput
-) {
+if (shoeInput) {
 
     shoeInput.addEventListener(
         "keydown",
-        function (
-            event
-        ) {
+        function(event) {
 
             if (
-                event.key !==
-                "Enter"
+                event.key !== "Enter"
             ) {
 
                 return;
@@ -2180,28 +1916,16 @@ if (
                 shoeInput.value.trim();
 
 
-            if (
-                !query
-            ) {
+            if (!query) {
 
                 return;
 
             }
 
 
-            console.log(
-                "Search dengan Enter:",
-                query
-            );
-
-
-            /*
-               Reset scanner agar pencarian
-               tidak dipanggil dua kali.
-            */
-
             scannerBuffer =
                 "";
+
 
             scannerStartTime =
                 0;
@@ -2217,23 +1941,18 @@ if (
 }
 
 
-/* =====================================
-   ESC UNTUK TUTUP REKOMENDASI
-===================================== */
+/* =========================================================
+   ESC TUTUP REKOMENDASI
+========================================================= */
 
-if (
-    shoeInput
-) {
+if (shoeInput) {
 
     shoeInput.addEventListener(
         "keydown",
-        function (
-            event
-        ) {
+        function(event) {
 
             if (
-                event.key ===
-                "Escape"
+                event.key === "Escape"
             ) {
 
                 hideSuggestions();
@@ -2246,25 +1965,19 @@ if (
 }
 
 
-/* =====================================
+/* =========================================================
    FOCUS INPUT
-===================================== */
+========================================================= */
 
-if (
-    shoeInput
-) {
+if (shoeInput) {
 
     shoeInput.addEventListener(
         "focus",
-        function () {
+        function() {
 
             const query =
                 shoeInput.value.trim();
 
-
-            /* =====================================
-               JANGAN REKOMENDASI BARCODE
-            ===================================== */
 
             if (
                 isBarcodeQuery(
@@ -2278,11 +1991,6 @@ if (
 
             }
 
-
-            /*
-               Jika ada query teks cukup panjang,
-               ambil rekomendasi.
-            */
 
             if (
                 query.length >= 3
@@ -2300,23 +2008,20 @@ if (
 }
 
 
-/* =====================================
+/* =========================================================
    KLIK DI LUAR REKOMENDASI
-===================================== */
+========================================================= */
 
 document.addEventListener(
     "click",
-    function (
-        event
-    ) {
+    function(event) {
 
         if (
             suggestionsContainer &&
             !suggestionsContainer.contains(
                 event.target
             ) &&
-            event.target !==
-            shoeInput
+            event.target !== shoeInput
         ) {
 
             hideSuggestions();
@@ -2327,12 +2032,456 @@ document.addEventListener(
 );
 
 
-/* =====================================
-   DEBUG AWAL
-===================================== */
+/* =========================================================
+   ACCORDION
+========================================================= */
+
+function getAccordionItems() {
+
+    return document.querySelectorAll(
+        ".accordion-item"
+    );
+
+}
+
+
+function getInfoNavButtons() {
+
+    return document.querySelectorAll(
+        ".info-nav"
+    );
+
+}
+
+
+/* =========================================================
+   BUKA ACCORDION
+========================================================= */
+
+function openAccordion(targetId) {
+
+    const target =
+        document.getElementById(
+            targetId
+        );
+
+
+    if (!target) {
+
+        return;
+
+    }
+
+
+    const accordionItems =
+        getAccordionItems();
+
+
+    accordionItems.forEach(
+        item => {
+
+            if (
+                item.classList.contains(
+                    "hidden"
+                )
+            ) {
+
+                return;
+
+            }
+
+
+            item.classList.remove(
+                "open"
+            );
+
+
+            const trigger =
+                item.querySelector(
+                    ".accordion-trigger"
+                );
+
+
+            if (trigger) {
+
+                trigger.setAttribute(
+                    "aria-expanded",
+                    "false"
+                );
+
+            }
+
+        }
+    );
+
+
+    target.classList.add(
+        "open"
+    );
+
+
+    const targetTrigger =
+        target.querySelector(
+            ".accordion-trigger"
+        );
+
+
+    if (targetTrigger) {
+
+        targetTrigger.setAttribute(
+            "aria-expanded",
+            "true"
+        );
+
+    }
+
+
+    const infoNavButtons =
+        getInfoNavButtons();
+
+
+    infoNavButtons.forEach(
+        button => {
+
+            button.classList.remove(
+                "active"
+            );
+
+
+            if (
+                button.dataset.target ===
+                targetId
+            ) {
+
+                if (
+                    !button.classList.contains(
+                        "hidden"
+                    )
+                ) {
+
+                    button.classList.add(
+                        "active"
+                    );
+
+                }
+
+            }
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   RESET ACCORDION
+========================================================= */
+
+function resetAccordion() {
+
+    const accordionItems =
+        getAccordionItems();
+
+
+    const infoNavButtons =
+        getInfoNavButtons();
+
+
+    accordionItems.forEach(
+        item => {
+
+            item.classList.remove(
+                "open"
+            );
+
+
+            const trigger =
+                item.querySelector(
+                    ".accordion-trigger"
+                );
+
+
+            if (trigger) {
+
+                trigger.setAttribute(
+                    "aria-expanded",
+                    "false"
+                );
+
+            }
+
+        }
+    );
+
+
+    infoNavButtons.forEach(
+        button => {
+
+            button.classList.remove(
+                "active"
+            );
+
+        }
+    );
+
+
+    /*
+       Urutan default:
+       1. Keunggulan
+       2. Material
+       3. Fungsi
+       4. Teknologi
+
+       Keunggulan dibuka otomatis
+       jika tersedia.
+    */
+
+    const firstAvailableAccordion =
+        Array.from(
+            accordionItems
+        ).find(
+            item =>
+                !item.classList.contains(
+                    "hidden"
+                )
+        );
+
+
+    if (
+        firstAvailableAccordion
+    ) {
+
+        openAccordion(
+            firstAvailableAccordion.id
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   EVENT KLIK ACCORDION
+========================================================= */
+
+function initializeAccordionEvents() {
+
+    const accordionItems =
+        getAccordionItems();
+
+
+    accordionItems.forEach(
+        item => {
+
+            const trigger =
+                item.querySelector(
+                    ".accordion-trigger"
+                );
+
+
+            if (!trigger) {
+
+                return;
+
+            }
+
+
+            /*
+               Hindari event listener
+               dipasang dua kali.
+            */
+
+            if (
+                trigger.dataset.initialized ===
+                "true"
+            ) {
+
+                return;
+
+            }
+
+
+            trigger.dataset.initialized =
+                "true";
+
+
+            trigger.addEventListener(
+                "click",
+                function() {
+
+                    const isOpen =
+                        item.classList.contains(
+                            "open"
+                        );
+
+
+                    const itemId =
+                        item.id;
+
+
+                    if (isOpen) {
+
+                        item.classList.remove(
+                            "open"
+                        );
+
+
+                        trigger.setAttribute(
+                            "aria-expanded",
+                            "false"
+                        );
+
+
+                        getInfoNavButtons().forEach(
+                            button => {
+
+                                if (
+                                    button.dataset.target ===
+                                    itemId
+                                ) {
+
+                                    button.classList.remove(
+                                        "active"
+                                    );
+
+                                }
+
+                            }
+                        );
+
+
+                        return;
+
+                    }
+
+
+                    openAccordion(
+                        itemId
+                    );
+
+                }
+            );
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   EVENT MENU SIDEBAR
+========================================================= */
+
+function initializeSidebarEvents() {
+
+    const infoNavButtons =
+        getInfoNavButtons();
+
+
+    infoNavButtons.forEach(
+        button => {
+
+            if (
+                button.dataset.initialized ===
+                "true"
+            ) {
+
+                return;
+
+            }
+
+
+            button.dataset.initialized =
+                "true";
+
+
+            button.addEventListener(
+                "click",
+                function() {
+
+                    const targetId =
+                        button.dataset.target;
+
+
+                    if (!targetId) {
+
+                        return;
+
+                    }
+
+
+                    const target =
+                        document.getElementById(
+                            targetId
+                        );
+
+
+                    /*
+                       Jangan buka menu
+                       jika card tersembunyi.
+                    */
+
+                    if (
+                        !target ||
+                        target.classList.contains(
+                            "hidden"
+                        )
+                    ) {
+
+                        return;
+
+                    }
+
+
+                    openAccordion(
+                        targetId
+                    );
+
+
+                    /*
+                       Scroll halus
+                       pada mobile.
+                    */
+
+                    if (
+                        window.innerWidth <= 768
+                    ) {
+
+                        target.scrollIntoView({
+                            behavior:
+                                "smooth",
+
+                            block:
+                                "start"
+                        });
+
+                    }
+
+                }
+            );
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   INISIALISASI ACCORDION
+========================================================= */
+
+initializeAccordionEvents();
+
+
+initializeSidebarEvents();
+
+
+/* =========================================================
+   DEBUG
+========================================================= */
 
 console.log(
-    "ShoeInfo frontend berhasil dimuat."
+    "SNEAKERS INDEX frontend berhasil dimuat."
 );
 
 
@@ -2347,8 +2496,20 @@ console.log(
         resultSection:
             !!resultSection,
 
-        productName:
-            !!productName,
+        advantagesCard:
+            !!advantagesCard,
+
+        materialsCard:
+            !!materialsCard,
+
+        functionsCard:
+            !!functionsCard,
+
+        technologiesCard:
+            !!technologiesCard,
+
+        technologyNavButton:
+            !!technologyNavButton,
 
         advantages:
             !!advantages,
@@ -2360,18 +2521,6 @@ console.log(
             !!functions,
 
         technologies:
-            !!technologies,
-
-        technologiesCard:
-            !!technologiesCard,
-
-        productLabels:
-            !!productLabels,
-
-        shoeTypeLabel:
-            !!shoeTypeLabel,
-
-        categoryLabel:
-            !!categoryLabel
+            !!technologies
     }
 );

@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="id">
 
@@ -10,7 +11,14 @@
         content="width=device-width, initial-scale=1.0"
     >
 
-    <title>SNEAKERS INDEX - Informasi Database Sneakers</title>
+    <meta
+        name="description"
+        content="SNEAKERS INDEX - Pusat informasi dan database sneakers."
+    >
+
+    <title>
+        SNEAKERS INDEX - Database Informasi Sneakers
+    </title>
 
     <link
         rel="stylesheet"
@@ -22,58 +30,162 @@
 
 <body>
 
-    <main class="container">
+
+    <!-- =========================================
+         NAVIGATION
+    ========================================== -->
+
+    <nav class="navbar">
+
+        <div class="nav-container">
 
 
-        <!-- ================================
-             HEADER
-        ================================= -->
+            <!-- LOGO -->
 
-        <header class="header">
-
-            <div class="logo">
+            <a
+                href="#"
+                class="nav-logo"
+            >
                 SNEAKERS<span>INDEX</span>
+            </a>
+
+
+            <!-- DESKTOP NAVIGATION -->
+
+            <div class="nav-links">
+
+                <a href="#home">
+                    Beranda
+                </a>
+
+                <a href="#searchSection">
+                    Cari
+                </a>
+
+                <a href="#resultSection">
+                    Informasi
+                </a>
+
+                <a href="#about">
+                    Tentang
+                </a>
+
             </div>
 
-            <p class="subtitle">
-                Temukan informasi sepatu dengan cepat
+
+            <!-- MOBILE MENU BUTTON -->
+
+            <button
+                id="menuButton"
+                class="menu-button"
+                type="button"
+                aria-label="Buka menu navigasi"
+                aria-expanded="false"
+            >
+                ☰
+            </button>
+
+
+        </div>
+
+    </nav>
+
+
+    <!-- =========================================
+         MAIN CONTAINER
+    ========================================== -->
+
+    <main
+        id="home"
+        class="container"
+    >
+
+
+        <!-- =====================================
+             BREADCRUMB
+        ====================================== -->
+
+        <div class="breadcrumb">
+
+            <span>
+                Beranda
+            </span>
+
+            <span class="breadcrumb-separator">
+                ›
+            </span>
+
+            <span>
+                Database Sneakers
+            </span>
+
+        </div>
+
+
+        <!-- =====================================
+             HERO / INTRODUCTION
+        ====================================== -->
+
+        <header class="hero">
+
+            <p class="hero-label">
+                SNEAKER INFORMATION DATABASE
+            </p>
+
+            <h1>
+                Temukan informasi sneakers secara detail.
+            </h1>
+
+            <p class="hero-description">
+                Cari berdasarkan nama produk, SKU, atau nomor artikel
+                untuk melihat informasi mengenai keunggulan, material,
+                fungsi, dan teknologi yang digunakan.
             </p>
 
         </header>
 
 
-        <!-- ================================
+        <!-- =====================================
              SEARCH SECTION
-        ================================= -->
+        ====================================== -->
 
-        <section class="search-section">
+        <section
+            id="searchSection"
+            class="search-section"
+            aria-label="Pencarian sneakers"
+        >
 
 
             <!-- SEARCH BOX -->
 
             <div class="search-box">
 
+                <div class="search-icon">
+                    ⌕
+                </div>
+
                 <input
                     type="text"
                     id="shoeInput"
-                    placeholder="Masukkan nama sepatu, SKU, atau artikel..."
+                    placeholder="Cari nama sneakers, SKU, atau artikel..."
                     autocomplete="off"
+                    aria-label="Cari sneakers berdasarkan nama atau SKU"
                 >
 
                 <button
                     id="searchButton"
                     type="button"
                 >
-                    Cari Informasi
+                    Cari
+                    <span>
+                        →
+                    </span>
                 </button>
 
             </div>
 
 
-            <!-- ================================
-                 SEARCH SUGGESTIONS
-                 Digunakan oleh script.js
-            ================================= -->
+            <!-- SEARCH SUGGESTIONS -->
 
             <div
                 id="suggestions"
@@ -85,15 +197,22 @@
             <!-- SEARCH HINT -->
 
             <p class="search-hint">
-                Contoh: Nike Air Max 270 atau AH8050-100
+
+                <span>
+                    CONTOH
+                </span>
+
+                Nike Air Max 270 · AH8050-100
+
             </p>
+
 
         </section>
 
 
-        <!-- ================================
+        <!-- =====================================
              LOADING
-        ================================= -->
+        ====================================== -->
 
         <div
             id="loading"
@@ -103,186 +222,15 @@
             <div class="spinner"></div>
 
             <p>
-                Mencari informasi...
+                Sedang mencari informasi sneakers...
             </p>
 
         </div>
 
 
-        <!-- ================================
-             RESULT SECTION
-        ================================= -->
-
-        <section
-            id="resultSection"
-            class="result-section hidden"
-        >
-
-
-            <!-- PRODUCT TITLE -->
-
-            <div class="product-header">
-
-                <p class="result-label">
-                    HASIL PENCARIAN
-                </p>
-
-                <h1 id="productName">
-                    -
-                </h1>
-
-                <div id="productColorway" class="product-colorway hidden"></div>
-
-                <!-- ================================
-                     TIPE DAN KATEGORI
-                ================================= -->
-
-                <div
-                    id="productLabels"
-                    class="product-labels hidden"
-                >
-
-                    <span
-                        id="shoeTypeLabel"
-                        class="product-badge"
-                    >
-                    </span>
-
-                    <span
-                        id="categoryLabel"
-                        class="product-badge"
-                    >
-                    </span>
-
-                </div>
-
-            </div>
-
-
-            <!-- ================================
-                 KEUNGGULAN
-            ================================= -->
-
-            <article class="info-card">
-
-                <div class="card-icon">
-                    ★
-                </div>
-
-                <div class="card-content">
-
-                    <h2>
-                        Keunggulan
-                    </h2>
-
-                    <ul id="advantages">
-                    </ul>
-
-                </div>
-
-            </article>
-
-
-            <!-- ================================
-                 BAHAN
-            ================================= -->
-
-            <article class="info-card">
-
-                <div class="card-icon">
-                    ◈
-                </div>
-
-                <div class="card-content">
-
-                    <h2>
-                        Bahan
-                    </h2>
-
-                    <ul id="materials">
-                    </ul>
-
-                </div>
-
-            </article>
-
-
-            <!-- ================================
-                 FUNGSI
-            ================================= -->
-
-            <article class="info-card">
-
-                <div class="card-icon">
-                    ◎
-                </div>
-
-                <div class="card-content">
-
-                    <h2>
-                        Fungsi
-                    </h2>
-
-                    <ul id="functions">
-                    </ul>
-
-                </div>
-
-            </article>
-
-
-            <!-- ================================
-                 TEKNOLOGI
-            ================================= -->
-
-            <article
-                id="technologiesCard"
-                class="info-card hidden"
-            >
-
-                <div class="card-icon">
-                    ⚙
-                </div>
-
-                <div class="card-content">
-
-                    <h2>
-                        Teknologi
-                    </h2>
-
-                    <ul id="technologies">
-                    </ul>
-
-                </div>
-
-            </article>
-
-
-            <!-- ================================
-                 SOURCE INFO
-            ================================= -->
-
-            <div class="source-info">
-
-                <span>
-                    ⓘ
-                </span>
-
-                <p>
-                    Informasi produk dapat berasal dari database S
-                    atau dibuat menggunakan AI Gemini apabila informasi
-                    produk belum tersedia di database.
-                </p>
-
-            </div>
-
-
-        </section>
-
-
-        <!-- ================================
+        <!-- =====================================
              EMPTY STATE
-        ================================= -->
+        ====================================== -->
 
         <section
             id="emptyState"
@@ -290,24 +238,360 @@
         >
 
             <div class="empty-icon">
-                👟
+                ⌕
             </div>
 
             <h2>
-                Belum ada pencarian
+                Mulai pencarian
             </h2>
 
             <p>
-                Masukkan nama sepatu atau SKU untuk melihat
-                informasi produk.
+                Masukkan nama sneakers, SKU, atau nomor artikel
+                pada kolom pencarian untuk menemukan informasi produk.
             </p>
 
         </section>
 
 
-        <!-- ================================
+        <!-- =====================================
+             RESULT SECTION
+        ====================================== -->
+
+        <section
+    id="resultSection"
+    class="result-section hidden"
+>
+
+    <!-- PRODUCT HEADER -->
+
+    <div class="product-header">
+
+        <p class="result-label">
+            HASIL PENCARIAN
+        </p>
+
+        <h1 id="productName">
+            -
+        </h1>
+
+        <div
+            id="productColorway"
+            class="product-colorway hidden"
+        >
+        </div>
+
+        <div
+            id="productLabels"
+            class="product-labels hidden"
+        >
+
+            <span
+                id="shoeTypeLabel"
+                class="product-badge"
+            >
+            </span>
+
+            <span
+                id="categoryLabel"
+                class="product-badge"
+            >
+            </span>
+
+        </div>
+
+    </div>
+
+
+    <!-- INFORMASI LAYOUT -->
+
+    <div class="information-layout">
+
+
+        <!-- SIDEBAR -->
+
+        <aside class="information-sidebar">
+
+            <p class="information-title">
+                INFORMASI
+            </p>
+
+            <button
+                class="info-nav active"
+                type="button"
+                data-target="advantagesAccordion"
+            >
+                Keunggulan
+            </button>
+
+            <button
+                class="info-nav"
+                type="button"
+                data-target="materialsAccordion"
+            >
+                Material
+            </button>
+
+            <button
+                class="info-nav"
+                type="button"
+                data-target="functionsAccordion"
+            >
+                Fungsi
+            </button>
+
+            <button
+                id="technologyNav"
+                class="info-nav hidden"
+                type="button"
+                data-target="technologiesAccordion"
+            >
+                Teknologi
+            </button>
+
+            <button
+                class="info-nav"
+                type="button"
+                data-target="sourceAccordion"
+            >
+                Sumber Informasi
+            </button>
+
+        </aside>
+
+
+        <!-- ACCORDION AREA -->
+
+        <div class="accordion-area">
+
+
+            <!-- KEUNGGULAN -->
+
+            <article
+                id="advantagesAccordion"
+                class="accordion-item open"
+            >
+
+                <button
+                    class="accordion-trigger"
+                    type="button"
+                    aria-expanded="true"
+                >
+
+                    <span>
+                        Keunggulan
+                    </span>
+
+                    <span class="accordion-arrow">
+                        ↓
+                    </span>
+
+                </button>
+
+                <div class="accordion-content">
+
+                    <div class="accordion-inner">
+
+                        <ul id="advantages">
+                        </ul>
+
+                    </div>
+
+                </div>
+
+            </article>
+
+
+            <!-- MATERIAL -->
+
+            <article
+                id="materialsAccordion"
+                class="accordion-item"
+            >
+
+                <button
+                    class="accordion-trigger"
+                    type="button"
+                    aria-expanded="false"
+                >
+
+                    <span>
+                        Material
+                    </span>
+
+                    <span class="accordion-arrow">
+                        ↓
+                    </span>
+
+                </button>
+
+                <div class="accordion-content">
+
+                    <div class="accordion-inner">
+
+                        <ul id="materials">
+                        </ul>
+
+                    </div>
+
+                </div>
+
+            </article>
+
+
+            <!-- FUNGSI -->
+
+            <article
+                id="functionsAccordion"
+                class="accordion-item"
+            >
+
+                <button
+                    class="accordion-trigger"
+                    type="button"
+                    aria-expanded="false"
+                >
+
+                    <span>
+                        Fungsi
+                    </span>
+
+                    <span class="accordion-arrow">
+                        ↓
+                    </span>
+
+                </button>
+
+                <div class="accordion-content">
+
+                    <div class="accordion-inner">
+
+                        <ul id="functions">
+                        </ul>
+
+                    </div>
+
+                </div>
+
+            </article>
+
+
+            <!-- TEKNOLOGI -->
+
+            <article
+                id="technologiesAccordion"
+                class="accordion-item hidden"
+            >
+
+                <button
+                    class="accordion-trigger"
+                    type="button"
+                    aria-expanded="false"
+                >
+
+                    <span>
+                        Teknologi
+                    </span>
+
+                    <span class="accordion-arrow">
+                        ↓
+                    </span>
+
+                </button>
+
+                <div class="accordion-content">
+
+                    <div class="accordion-inner">
+
+                        <ul id="technologies">
+                        </ul>
+
+                    </div>
+
+                </div>
+
+            </article>
+
+
+            <!-- SUMBER -->
+
+            <article
+                id="sourceAccordion"
+                class="accordion-item"
+            >
+
+                <button
+                    class="accordion-trigger"
+                    type="button"
+                    aria-expanded="false"
+                >
+
+                    <span>
+                        Sumber Informasi
+                    </span>
+
+                    <span class="accordion-arrow">
+                        ↓
+                    </span>
+
+                </button>
+
+                <div class="accordion-content">
+
+                    <div class="accordion-inner">
+
+                        <div class="source-info">
+
+                            <span>
+                                ⓘ
+                            </span>
+
+                            <p>
+                                Informasi produk dapat berasal dari
+                                database SNEAKERS INDEX atau dibuat
+                                menggunakan AI apabila informasi produk
+                                belum tersedia di database.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </article>
+
+
+        </div>
+
+    </div>
+
+</section>
+
+
+        <!-- =====================================
+             ABOUT
+        ====================================== -->
+
+        <section
+            id="about"
+            class="about-section"
+        >
+
+            <p class="about-label">
+                TENTANG SNEAKERS INDEX
+            </p>
+
+            <p>
+                SNEAKERS INDEX adalah pusat informasi untuk membantu
+                menemukan dan memahami detail berbagai produk sneakers.
+            </p>
+
+        </section>
+
+
+        <!-- =====================================
              FOOTER
-        ================================= -->
+        ====================================== -->
 
         <footer class="footer">
 
@@ -321,9 +605,12 @@
     </main>
 
 
-    <!-- JAVASCRIPT -->
+    <!-- =====================================
+         JAVASCRIPT
+    ====================================== -->
 
     <script src="script.js"></script>
+
 
 </body>
 
