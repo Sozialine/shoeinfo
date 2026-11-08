@@ -1,12 +1,10 @@
 /* =====================================
-   CONFIG BACKEND LOGIN
+   KONFIGURASI LOGIN LOKAL (ADMIN)
 ===================================== */
 
-const LOGIN_API_URL =
-    "https://kqwfxglzelhdjsxeceld.supabase.co/functions/v1/admin-login";
-
-const SUPABASE_KEY =
-    "sb_publishable_PQbg0iClbuSLCjurjMT_Nw_-YjIply-";
+// Tentukan username dan password admin pilihanmu di sini:
+const ADMIN_USER = "admin";
+const ADMIN_PASS = "admin123";
 
 
 /* =====================================
@@ -20,11 +18,11 @@ document.addEventListener(
         const loginForm =
             document.getElementById("loginForm");
 
-       const usernameInput =
-    document.getElementById("username");
+        const usernameInput =
+            document.getElementById("username");
 
-const passwordInput =
-    document.getElementById("password");
+        const passwordInput =
+            document.getElementById("password");
 
         const loginButton =
             document.getElementById("loginButton");
@@ -46,14 +44,7 @@ const passwordInput =
         ) {
 
             console.error(
-                "Element login tidak ditemukan.",
-                {
-                    loginForm,
-                    usernameInput,
-                    passwordInput,
-                    loginButton,
-                    loginMessage
-                }
+                "Element login tidak ditemukan."
             );
 
             return;
@@ -116,7 +107,7 @@ const passwordInput =
 
         loginForm.addEventListener(
             "submit",
-            async function (event) {
+            function (event) {
 
                 event.preventDefault();
 
@@ -167,143 +158,56 @@ const passwordInput =
                     "Memeriksa...";
 
 
-                try {
-
-                    const response =
-                        await fetch(
-                            LOGIN_API_URL,
-                            {
-
-                                method:
-                                    "POST",
-
-                                headers: {
-
-                                    "Content-Type":
-                                        "application/json",
-
-                                    "apikey":
-                                        SUPABASE_KEY
-
-                                },
-
-                                body:
-                                    JSON.stringify({
-
-                                        username:
-                                            username,
-
-                                        password:
-                                            password
-
-                                    })
-
-                            }
-                        );
-
-
-                    let data = {};
-
-
-                    try {
-
-                        data =
-                            await response.json();
-
-                    } catch (error) {
-
-                        throw new Error(
-                            "Respons backend tidak valid."
-                        );
-
-                    }
-
-
-                    if (!response.ok) {
-
-                        throw new Error(
-                            data.error ||
-                            data.message ||
-                            `Login gagal. HTTP ${response.status}`
-                        );
-
-                    }
-
+                // Simulasi pengecekan login secara lokal
+                setTimeout(function () {
 
                     if (
-                        data.success !== true
+                        username === ADMIN_USER &&
+                        password === ADMIN_PASS
                     ) {
 
-                        throw new Error(
-                            data.error ||
+                        /* SIMPAN TOKEN LOKAL */
+
+                        localStorage.setItem(
+                            "shoeinfo_admin_token",
+                            "local_admin_token_secure"
+                        );
+
+                        localStorage.setItem(
+                            "shoeinfo_admin_username",
+                            username
+                        );
+
+                        showMessage(
+                            "Login berhasil. Mengalihkan...",
+                            "success"
+                        );
+
+                        setTimeout(
+                            function () {
+
+                                window.location.href =
+                                    "admin.html";
+
+                            },
+                            700
+                        );
+
+                    } else {
+
+                        loginButton.disabled =
+                            false;
+
+                        loginButton.textContent =
+                            "Masuk ke Dashboard";
+
+                        showMessage(
                             "Username atau password salah."
                         );
 
                     }
 
-
-                    if (!data.token) {
-
-                        throw new Error(
-                            "Token login tidak diterima."
-                        );
-
-                    }
-
-
-                    /* SIMPAN TOKEN */
-
-                    localStorage.setItem(
-                        "shoeinfo_admin_token",
-                        data.token
-                    );
-
-
-                    localStorage.setItem(
-                        "shoeinfo_admin_username",
-                        data.username || username
-                    );
-
-
-                    showMessage(
-                        "Login berhasil. Mengalihkan...",
-                        "success"
-                    );
-
-
-                    setTimeout(
-                        function () {
-
-                            window.location.href =
-                                "admin.html";
-
-                        },
-                        700
-                    );
-
-
-                } catch (error) {
-
-                    console.error(
-                        "Login error:",
-                        error
-                    );
-
-
-                    showMessage(
-                        error.message ||
-                        "Terjadi kesalahan saat login."
-                    );
-
-                } finally {
-
-                    loginButton.disabled =
-                        false;
-
-                    loginButton.textContent =
-                        "Masuk ke Dashboard";
-
-                }
+                }, 500);
 
             }
         );
