@@ -8,9 +8,7 @@
    KONFIGURASI BACKEND (CPANEL SIZELEGACY)
 ========================================================= */
 
-const SEARCH_API_URL =
-    "https://sizelegacy.com/shoeinfo-api/search.php";
-
+const SEARCH_API_URL = "/api/search";
 const SUGGESTIONS_API_URL = ""; // Dinonaktifkan sementara jika belum ada di PHP cPanel
 
 
