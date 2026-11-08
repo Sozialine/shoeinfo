@@ -23,7 +23,7 @@ export default async function handler(req, res) {
         return res.status(400).json({ success: false, error: 'Query tidak boleh kosong' });
     }
 
-    const apiKey = "GANTI_DENGAN_API_KEY_DEEPSEEK_KAMU"; 
+    const apiKey = "sk-7ffd722e1ae44299820ba5ba951877e3"; 
     const url = "https://api.deepseek.com/v1/chat/completions";
 
     const systemPrompt = "Kamu adalah sistem database dan product knowledge sneakers yang akurat. Berikan informasi dalam format JSON valid yang berisi: name, colorway, shoe_type, category, advantages (array), materials (array), functions (array), technologies (array). Jika tidak ditemukan, set found: false.";
