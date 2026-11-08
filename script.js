@@ -1,31 +1,17 @@
 /* =========================================================
    SNEAKERS INDEX
-   SCRIPT.JS - FINAL VERSION
+   SCRIPT.JS - FINAL VERSION (UPDATED TO CPANEL BACKEND)
 ========================================================= */
 
 
 /* =========================================================
-   KONFIGURASI SUPABASE
+   KONFIGURASI BACKEND (CPANEL SIZELEGACY)
 ========================================================= */
-
-const SUPABASE_URL =
-    "https://kqwfxglzelhdjsxeceld.supabase.co";
-
 
 const SEARCH_API_URL =
-    `${SUPABASE_URL}/functions/v1/search-shoe`;
+    "https://sizelegacy.com/shoeinfo-api/search.php";
 
-
-const SUGGESTIONS_API_URL =
-    `${SUPABASE_URL}/functions/v1/search-suggestions`;
-
-
-/* =========================================================
-   PUBLISHABLE KEY SUPABASE
-========================================================= */
-
-const SUPABASE_KEY =
-    "sb_publishable_PQbg0iClbuSLCjurjMT_Nw_-YjIply-";
+const SUGGESTIONS_API_URL = ""; // Dinonaktifkan sementara jika belum ada di PHP cPanel
 
 
 /* =========================================================
@@ -267,10 +253,7 @@ function getHeaders() {
     return {
 
         "Content-Type":
-            "application/json",
-
-        "apikey":
-            SUPABASE_KEY
+            "application/json"
 
     };
 
@@ -1443,7 +1426,7 @@ function showError(message) {
 
     addListItem(
         materials,
-        "Periksa koneksi internet dan konfigurasi Supabase."
+        "Periksa koneksi internet dan server cPanel."
     );
 
 
@@ -1468,169 +1451,11 @@ function showError(message) {
 
 
 /* =========================================================
-   AMBIL REKOMENDASI
+   AMBIL REKOMENDASI (DILEWATI JIKA BELUM ADA)
 ========================================================= */
 
 async function getSuggestions(query) {
-
-    if (!shoeInput) {
-
-        return;
-
-    }
-
-
-    const cleanQuery =
-        String(
-            query || ""
-        ).trim();
-
-
-    if (
-        isBarcodeQuery(
-            cleanQuery
-        )
-    ) {
-
-        hideSuggestions();
-
-        return;
-
-    }
-
-
-    if (
-        cleanQuery.length < 3
-    ) {
-
-        hideSuggestions();
-
-        return;
-
-    }
-
-
-    if (
-        suggestionAbortController
-    ) {
-
-        suggestionAbortController.abort();
-
-    }
-
-
-    suggestionAbortController =
-        new AbortController();
-
-
-    try {
-
-        const response =
-            await fetch(
-                SUGGESTIONS_API_URL,
-                {
-
-                    method:
-                        "POST",
-
-                    headers:
-                        getHeaders(),
-
-                    signal:
-                        suggestionAbortController.signal,
-
-                    body:
-                        JSON.stringify({
-                            query:
-                                cleanQuery
-                        })
-
-                }
-            );
-
-
-        const data =
-            await getResponseData(
-                response
-            );
-
-
-        if (
-            !response.ok
-        ) {
-
-            hideSuggestions();
-
-            return;
-
-        }
-
-
-        if (
-            data.success !== true ||
-            !Array.isArray(
-                data.suggestions
-            )
-        ) {
-
-            hideSuggestions();
-
-            return;
-
-        }
-
-
-        if (
-            shoeInput.value.trim() !==
-            cleanQuery
-        ) {
-
-            return;
-
-        }
-
-
-        const uniqueSuggestions =
-            uniqueArray(
-                data.suggestions
-            );
-
-
-        currentSuggestions =
-            uniqueSuggestions;
-
-
-        showSuggestions(
-            uniqueSuggestions
-        );
-
-    } catch (error) {
-
-        if (
-            error?.name ===
-            "AbortError"
-        ) {
-
-            return;
-
-        }
-
-
-        console.error(
-            "Suggestions error:",
-            error
-        );
-
-
-        hideSuggestions();
-
-    } finally {
-
-        suggestionAbortController =
-            null;
-
-    }
-
+    hideSuggestions();
 }
 
 
@@ -1639,132 +1464,7 @@ async function getSuggestions(query) {
 ========================================================= */
 
 function showSuggestions(items) {
-
-    if (
-        !suggestionsContainer
-    ) {
-
-        return;
-
-    }
-
-
-    suggestionsContainer.innerHTML =
-        "";
-
-
-    const cleanItems =
-        uniqueArray(
-            items
-        );
-
-
-    if (
-        cleanItems.length === 0
-    ) {
-
-        hideSuggestions();
-
-        return;
-
-    }
-
-
-    const title =
-        document.createElement(
-            "p"
-        );
-
-
-    title.className =
-        "suggestions-title";
-
-
-    title.textContent =
-        "Rekomendasi pencarian";
-
-
-    suggestionsContainer.appendChild(
-        title
-    );
-
-
-    const list =
-        document.createElement(
-            "div"
-        );
-
-
-    list.className =
-        "suggestions-list";
-
-
-    cleanItems.forEach(
-        item => {
-
-            const button =
-                document.createElement(
-                    "button"
-                );
-
-
-            button.type =
-                "button";
-
-
-            button.className =
-                "suggestion-item";
-
-
-            button.textContent =
-                item;
-
-
-            button.addEventListener(
-                "click",
-                function () {
-
-                    if (shoeInput) {
-
-                        shoeInput.value =
-                            item;
-
-                    }
-
-
-                    clearTimeout(
-                        suggestionTimer
-                    );
-
-
-                    hideSuggestions();
-
-
-                    searchShoe(
-                        item
-                    );
-
-                }
-            );
-
-
-            list.appendChild(
-                button
-            );
-
-        }
-    );
-
-
-    suggestionsContainer.appendChild(
-        list
-    );
-
-
-    suggestionsContainer.classList.remove(
-        "hidden"
-    );
-
+    hideSuggestions();
 }
 
 
@@ -1807,52 +1507,7 @@ if (shoeInput) {
     shoeInput.addEventListener(
         "input",
         function () {
-
-            clearTimeout(
-                suggestionTimer
-            );
-
-
-            const query =
-                shoeInput.value.trim();
-
-
-            if (
-                isBarcodeQuery(
-                    query
-                )
-            ) {
-
-                hideSuggestions();
-
-                return;
-
-            }
-
-
-            if (
-                query.length < 3
-            ) {
-
-                hideSuggestions();
-
-                return;
-
-            }
-
-
-            suggestionTimer =
-                setTimeout(
-                    function () {
-
-                        getSuggestions(
-                            query
-                        );
-
-                    },
-                    500
-                );
-
+            // Placeholder input interaksi
         }
     );
 
@@ -1974,34 +1629,7 @@ if (shoeInput) {
     shoeInput.addEventListener(
         "focus",
         function() {
-
-            const query =
-                shoeInput.value.trim();
-
-
-            if (
-                isBarcodeQuery(
-                    query
-                )
-            ) {
-
-                hideSuggestions();
-
-                return;
-
-            }
-
-
-            if (
-                query.length >= 3
-            ) {
-
-                getSuggestions(
-                    query
-                );
-
-            }
-
+            // Focus action
         }
     );
 
@@ -2225,17 +1853,6 @@ function resetAccordion() {
     );
 
 
-    /*
-       Urutan default:
-       1. Keunggulan
-       2. Material
-       3. Fungsi
-       4. Teknologi
-
-       Keunggulan dibuka otomatis
-       jika tersedia.
-    */
-
     const firstAvailableAccordion =
         Array.from(
             accordionItems
@@ -2285,11 +1902,6 @@ function initializeAccordionEvents() {
 
             }
 
-
-            /*
-               Hindari event listener
-               dipasang dua kali.
-            */
 
             if (
                 trigger.dataset.initialized ===
@@ -2416,11 +2028,6 @@ function initializeSidebarEvents() {
                         );
 
 
-                    /*
-                       Jangan buka menu
-                       jika card tersembunyi.
-                    */
-
                     if (
                         !target ||
                         target.classList.contains(
@@ -2437,11 +2044,6 @@ function initializeSidebarEvents() {
                         targetId
                     );
 
-
-                    /*
-                       Scroll halus
-                       pada mobile.
-                    */
 
                     if (
                         window.innerWidth <= 768
@@ -2481,46 +2083,5 @@ initializeSidebarEvents();
 ========================================================= */
 
 console.log(
-    "SNEAKERS INDEX frontend berhasil dimuat."
-);
-
-
-console.log(
-    {
-        shoeInput:
-            !!shoeInput,
-
-        searchButton:
-            !!searchButton,
-
-        resultSection:
-            !!resultSection,
-
-        advantagesCard:
-            !!advantagesCard,
-
-        materialsCard:
-            !!materialsCard,
-
-        functionsCard:
-            !!functionsCard,
-
-        technologiesCard:
-            !!technologiesCard,
-
-        technologyNavButton:
-            !!technologyNavButton,
-
-        advantages:
-            !!advantages,
-
-        materials:
-            !!materials,
-
-        functions:
-            !!functions,
-
-        technologies:
-            !!technologies
-    }
+    "SNEAKERS INDEX frontend berhasil dimuat dengan backend cPanel."
 );
