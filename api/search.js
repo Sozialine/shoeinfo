@@ -23,7 +23,7 @@ export default async function handler(req, res) {
     }
 
     // Menggunakan API Key secara langsung agar bypass masalah Vercel Environment Variables
-    const apiKey = "sk-7ffd722e1ae44299820ba5ba951877e3"; 
+    const apiKey = "sk-3dd3902c898343bb9f4b832922c4393d"; 
     const url = "https://api.deepseek.com/v1/chat/completions";
 
     const systemPrompt = "Kamu adalah sistem database dan product knowledge sneakers yang akurat. Berikan informasi dalam format JSON valid yang berisi: name, colorway, shoe_type, category, advantages (array), materials (array), functions (array), technologies (array). Jika tidak ditemukan, set found: false.";
