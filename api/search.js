@@ -22,9 +22,13 @@ export default async function handler(req, res) {
         return res.status(400).json({ success: false, error: 'Query tidak boleh kosong' });
     }
 
-    // Pastikan memasukkan API Key Kenari yang valid di sini (berawalan kn-...)
-    const apiKey = "kn-282679d524cd1d05d9094acfd5b707a660d4d1f224401f26"; 
+    // Mengambil API Key secara aman dari Environment Variable Vercel
+    const apiKey = process.env.KENARI_API_KEY;
     const url = "https://kenari.id/v1/chat/completions";
+
+    if (!apiKey) {
+        return res.status(500).json({ success: false, error: 'API Key Kenari belum dikonfigurasi di server Vercel.' });
+    }
 
     const systemPrompt = "Kamu adalah sistem database dan product knowledge sneakers yang akurat. Berikan informasi murni dalam format JSON valid (tanpa markdown backtick ```) yang berisi: name, colorway, shoe_type, category, advantages (array), materials (array), functions (array), technologies (array). Jika tidak ditemukan, set found: false.";
 
@@ -61,9 +65,7 @@ export default async function handler(req, res) {
             return res.status(500).json({ success: false, error: "Respons AI kosong." });
         }
 
-        // Bersihkan bungkus markdown jika ada
         messageContent = messageContent.replace(/```json/g, '').replace(/```/g, '').trim();
-
         const content = JSON.parse(messageContent);
 
         return res.status(200).json({
