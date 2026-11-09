@@ -1,5 +1,4 @@
 export default async function handler(req, res) {
-    // Izinkan CORS otomatis untuk domain Vercel kamu
     res.setHeader('Access-Control-Allow-Credentials', true);
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
@@ -23,13 +22,8 @@ export default async function handler(req, res) {
         return res.status(400).json({ success: false, error: 'Query tidak boleh kosong' });
     }
 
-    // Mengambil API Key secara aman dari Environment Variables Vercel
-    const apiKey = process.env.DEEPSEEK_API_KEY;
-
-    if (!apiKey) {
-        return res.status(500).json({ success: false, error: 'Konfigurasi API Key DeepSeek belum diatur di server.' });
-    }
-
+    // Menggunakan API Key secara langsung agar bypass masalah Vercel Environment Variables
+    const apiKey = "sk-7ffd722e1ae44299820ba5ba951877e3"; 
     const url = "https://api.deepseek.com/v1/chat/completions";
 
     const systemPrompt = "Kamu adalah sistem database dan product knowledge sneakers yang akurat. Berikan informasi dalam format JSON valid yang berisi: name, colorway, shoe_type, category, advantages (array), materials (array), functions (array), technologies (array). Jika tidak ditemukan, set found: false.";
