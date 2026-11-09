@@ -22,8 +22,10 @@ export default async function handler(req, res) {
         return res.status(400).json({ success: false, error: 'Query tidak boleh kosong' });
     }
 
-    // Masukkan API Key Kenari kamu di sini (berawalan kn-...)
+    // 1. Masukkan API Key Kenari kamu di sini (berawalan kn-...)
     const apiKey = "kn-282679d524cd1d05d9094acfd5b707a660d4d1f224401f26"; 
+    
+    // 2. Gunakan endpoint resmi dari Kenari.id
     const url = "https://kenari.id/v1/chat/completions";
 
     const systemPrompt = "Kamu adalah sistem database dan product knowledge sneakers yang akurat. Berikan informasi dalam format JSON valid yang berisi: name, colorway, shoe_type, category, advantages (array), materials (array), functions (array), technologies (array). Jika tidak ditemukan, set found: false.";
@@ -36,7 +38,8 @@ export default async function handler(req, res) {
                 "Authorization": `Bearer ${apiKey}`
             },
             body: JSON.stringify({
-                model: "deepseek/deepseek-chat", // Format model yang didukung oleh Kenari
+                // 3. Nama model DeepSeek yang didukung di Kenari.id
+                model: "deepseek/deepseek-chat", 
                 messages: [
                     { role: "system", content: systemPrompt },
                     { role: "user", content: "Cari informasi sepatu: " + query }
