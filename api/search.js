@@ -22,8 +22,8 @@ export default async function handler(req, res) {
         return res.status(400).json({ success: false, error: 'Query tidak boleh kosong' });
     }
 
-    // Menggunakan API Key secara langsung agar bypass masalah Vercel Environment Variables
-    const apiKey = "sk-3dd3902c898343bb9f4b832922c4393d"; 
+    // Ganti dengan API key baru kamu yang bersih di sini
+    const apiKey = "sk-cd46b... (masukkan key baru kamu secara utuh di sini)"; 
     const url = "https://api.deepseek.com/v1/chat/completions";
 
     const systemPrompt = "Kamu adalah sistem database dan product knowledge sneakers yang akurat. Berikan informasi dalam format JSON valid yang berisi: name, colorway, shoe_type, category, advantages (array), materials (array), functions (array), technologies (array). Jika tidak ditemukan, set found: false.";
@@ -46,8 +46,13 @@ export default async function handler(req, res) {
             })
         });
 
+        // Tangkap isi pesan error mentah dari DeepSeek
         if (!response.ok) {
-            return res.status(500).json({ success: false, error: `Gagal terhubung ke DeepSeek API (HTTP Code: ${response.status})` });
+            const errorText = await response.text();
+            return res.status(500).json({ 
+                success: false, 
+                error: `DeepSeek Error (${response.status}): ${errorText}` 
+            });
         }
 
         const result = await response.json();
