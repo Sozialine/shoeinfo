@@ -19,7 +19,7 @@ export default async function handler(req, res) {
     }
 
     // Ganti URL di bawah ini dengan alamat file api_db.php di cPanel kamu
-    const cpanelApiUrl = "https://sizelegacy.com/api_db.php"; 
+   const cpanelApiUrl = "https://sizelegacy.com/shoeinfo-api/api_db.php"; 
 
     try {
         // --- 1. CEK KE DATABASE MYSQL CPANEL TERLEBIH DAHULU ---
