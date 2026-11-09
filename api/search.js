@@ -23,9 +23,9 @@ export default async function handler(req, res) {
     }
 
     const apiKey = "kn-282679d524cd1d05d9094acfd5b707a660d4d1f224401f26"; // Ganti dengan key Kenari kamu (kn-...)
-    const url = "https://kenari.id/v1/chat/completions";
+    const url = "[https://kenari.id/v1/chat/completions](https://kenari.id/v1/chat/completions)";
 
-    const systemPrompt = "Kamu adalah sistem database dan product knowledge sneakers yang akurat. Berikan informasi dalam format JSON valid yang berisi: name, colorway, shoe_type, category, advantages (array), materials (array), functions (array), technologies (array). Jika tidak ditemukan, set found: false.";
+    const systemPrompt = "Kamu adalah sistem database dan product knowledge sneakers yang akurat. Berikan informasi murni dalam format JSON valid (tanpa markdown backtick ```) yang berisi: name, colorway, shoe_type, category, advantages (array), materials (array), functions (array), technologies (array). Jika tidak ditemukan, set found: false.";
 
     try {
         const response = await fetch(url, {
@@ -35,7 +35,7 @@ export default async function handler(req, res) {
                 "Authorization": `Bearer ${apiKey}`
             },
             body: JSON.stringify({
-                model: "deepseek-v4-flash", // Menggunakan ID model yang tepat dari katalog Kenari
+                model: "deepseek-v4-flash",
                 messages: [
                     { role: "system", content: systemPrompt },
                     { role: "user", content: "Cari informasi sepatu: " + query }
@@ -54,7 +54,16 @@ export default async function handler(req, res) {
         }
 
         let result = JSON.parse(responseText);
-        const messageContent = result.choices?.[0]?.message?.content;
+        let messageContent = result.choices?.[0]?.message?.content;
+
+        if (!messageContent) {
+            return res.status(500).json({ success: false, error: "Respons AI kosong." });
+        }
+
+        // --- PEMBERSIH FORMAT MARKDOWN (PENTING) ---
+        // Menghilangkan bungkus ```json dan ``` jika AI tetap menyertakannya
+        messageContent = messageContent.replace(/```json/g, '').replace(/```/g, '').trim();
+
         const content = JSON.parse(messageContent);
 
         return res.status(200).json({
