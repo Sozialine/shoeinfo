@@ -22,8 +22,7 @@ export default async function handler(req, res) {
         return res.status(400).json({ success: false, error: 'Query tidak boleh kosong' });
     }
 
-    // Masukkan API Key Kenari kamu di sini (berawalan kn-...)
-    const apiKey = "kn-282679d524cd1d05d9094acfd5b707a660d4d1f224401f26"; 
+    const apiKey = "kn-282679d524cd1d05d9094acfd5b707a660d4d1f224401f26"; // Pastikan key berawalan kn-...
     const url = "https://kenari.id/v1/chat/completions";
 
     const systemPrompt = "Kamu adalah sistem database dan product knowledge sneakers yang akurat. Berikan informasi dalam format JSON valid yang berisi: name, colorway, shoe_type, category, advantages (array), materials (array), functions (array), technologies (array). Jika tidak ditemukan, set found: false.";
@@ -36,23 +35,44 @@ export default async function handler(req, res) {
                 "Authorization": `Bearer ${apiKey}`
             },
             body: JSON.stringify({
-                model: "deepseek-chat", // Diubah menjadi model standar Kenari
+                model: "deepseek-chat",
                 messages: [
                     { role: "system", content: systemPrompt },
                     { role: "user", content: "Cari informasi sepatu: " + query }
                 ],
-                response_format: { type: "json_object" },
                 temperature: 0.2
             })
         });
 
+        // Ambil teks mentah dari server Kenari untuk didiagnosis
+        const responseText = await response.text();
+
         if (!response.ok) {
-            const errorText = await response.text();
-            return res.status(500).json({ success: false, error: `Kenari API Error (${response.status}): ${errorText}` });
+            return res.status(500).json({ 
+                success: false, 
+                error: `Kenari Server Error [${response.status}]: ${responseText}` 
+            });
         }
 
-        const result = await response.json();
-        const content = JSON.parse(result.choices[0].message.content);
+        let result;
+        try {
+            result = JSON.parse(responseText);
+        } catch (e) {
+            return res.status(500).json({ 
+                success: false, 
+                error: `Gagal parse JSON dari Kenari: ${responseText}` 
+            });
+        }
+
+        const messageContent = result.choices?.[0]?.message?.content;
+        if (!messageContent) {
+            return res.status(500).json({ 
+                success: false, 
+                error: `Struktur balasan Kenari tidak valid: ${responseText}` 
+            });
+        }
+
+        const content = JSON.parse(messageContent);
 
         return res.status(200).json({
             success: true,
@@ -61,6 +81,6 @@ export default async function handler(req, res) {
         });
 
     } catch (error) {
-        return res.status(500).json({ success: false, error: error.message || "Terjadi kesalahan pada server." });
+        return res.status(500).json({ success: false, error: "Catch Error: " + error.message });
     }
 }
