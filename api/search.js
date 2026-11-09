@@ -22,8 +22,9 @@ export default async function handler(req, res) {
         return res.status(400).json({ success: false, error: 'Query tidak boleh kosong' });
     }
 
-    const apiKey = "MASUKKAN_API_KEY_KENARI_DI_SINI"; // Ganti dengan key Kenari kamu (kn-...)
-    const url = "https://kenari.id/v1/chat/completions"; // URL bersih tanpa format markdown
+    // Pastikan memasukkan API Key Kenari yang valid di sini (berawalan kn-...)
+    const apiKey = "kn-282679d524cd1d05d9094acfd5b707a660d4d1f224401f26"; 
+    const url = "https://kenari.id/v1/chat/completions";
 
     const systemPrompt = "Kamu adalah sistem database dan product knowledge sneakers yang akurat. Berikan informasi murni dalam format JSON valid (tanpa markdown backtick ```) yang berisi: name, colorway, shoe_type, category, advantages (array), materials (array), functions (array), technologies (array). Jika tidak ditemukan, set found: false.";
 
